@@ -1,5 +1,7 @@
 @echo off
 setlocal
+
+set DISTRO=Ubuntu-24.04
  
 echo ============================================
 echo   Irodori-TTS ROCm Auto Setup (WSL2 + Radeon)
