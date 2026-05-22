@@ -1,0 +1,29 @@
+#Irodori-TTS
+dacvae @ git+https://github.com/facebookresearch/dacvae
+datasets>=3.0.0
+gradio>=5.0.0
+huggingface-hub>=0.34.0,<1.0
+llvmlite>=0.40.0
+numba>=0.57.0
+peft>=0.18.0
+pyyaml>=6.0
+safetensors>=0.7.0
+soundfile>=0.12.0
+silentcipher @ git+https://github.com/SesameAILabs/silentcipher.git@d46d7d0893a583d8968ab3a6626e2289faec9152
+torchcodec>=0.10.0
+transformers<5
+tqdm>=4.67.3
+wandb>=0.17.0
+ 
+#Irodori-TTS-SERVER
+fastapi>=0.115.0
+#huggingface-hub>=0.34.0,<1.0
+pydantic-settings>=2.6.0
+python-dotenv>=1.0.1
+python-multipart>=0.0.9
+#soundfile>=0.12.0
+uvicorn[standard]>=0.32.0
+httpx>=0.27.0
+pytest>=8.0.0
+ruff>=0.9.0
+-e /opt/Irodori-TTS

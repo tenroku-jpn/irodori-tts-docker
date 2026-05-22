@@ -1,0 +1,52 @@
+# HuggingFace cache
+hf-cache/
+.cache/
+root/.cache/
+huggingface/
+hf_cache/
+
+# MIOpen cache
+miopen-cache/
+
+# Logs
+logs/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Model weights
+*.safetensors
+*.pth
+*.pt
+*.bin
+
+# Generated audio
+*.wav
+bench_*.wav
+
+# Virtual env
+venv/
+opt/venv/
+
+# Outputs
+outputs/
+
+# Containers / VM images
+*.tar
+*.img
+*.sqsh
+*.sif
+*.iso
+*.qcow2
+*.vmdk
+*.vdi
+*.ova
+*.ovf
+*.raw
+
+# Compressed images
+*.img.gz
+*.img.xz
+*.img.zst
+*.img.bz2
