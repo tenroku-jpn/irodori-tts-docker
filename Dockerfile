@@ -68,13 +68,15 @@ RUN location=$(pip show torch | grep Location | awk -F ": " '{print $2}') && \
 # ---------------------------------------------------------
 WORKDIR /opt/Irodori-TTS
 RUN git clone https://github.com/Aratako/Irodori-TTS.git .
+ENV PYTHONPATH=/opt/Irodori-TTS
  
 # ---------------------------------------------------------
 # Irodori-TTS-Server
 # ---------------------------------------------------------
 WORKDIR /opt/Irodori-TTS-Server
 RUN git clone https://github.com/Aratako/Irodori-TTS-Server.git .
- 
+ENV PYTHONPATH=/opt/Irodori-TTS-Server
+ENV PYTHONPATH=/opt/Irodori-TTS-Server/src
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
  

@@ -91,7 +91,7 @@ start_service "voicedesign" \
     "python3 /opt/Irodori-TTS/gradio_app_voicedesign.py --server-name 0.0.0.0 --server-port 7861"
 
 start_service "api" \
-    "uv run python -m irodori_openai_tts --host 0.0.0.0 --port 8088"
+    "python3 -m irodori_openai_tts --host 0.0.0.0 --port 8088"
 
 echo '[systemd] All services started.'
 
@@ -113,6 +113,6 @@ while true; do
 
     if ! monitor_service "api"; then
         start_service "api" \
-            "uv run python -m irodori_openai_tts --host 0.0.0.0 --port 8088"
+            "python3 -m irodori_openai_tts --host 0.0.0.0 --port 8088"
     fi
 done
