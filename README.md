@@ -194,6 +194,14 @@ rocminfo
 
 ---
 
+# 🖥️ GPU 別ベンチマーク比較
+
+| GPU | 平均推論時間 | RTF | ドライバ | OS |
+| --- | ----------- | --- | ------- | -- |
+| AMD Radeon RX 7900 XT | 15.58s | 0.92 | ROCm | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
+
+---
+
 # 🧩 Base Projects
 
 ## Irodori TTS
