@@ -195,7 +195,9 @@ rocminfo
 ---
 
 # 🖥️ GPU 別ベンチマーク比較
-
+ベンチマーク(benchmarck.py)は個別にIrodori-TTSフォルダに格納していただければNVIDIA環境でも動くと思います。
+V3で10回試行しています。
+V3から追加されたウォーターマーク付与処理がCPUで大変重いです。(V2に比べて大幅に処理時間が増えます)
 | GPU | 平均推論時間 | RTF | ドライバ | OS |
 | --- | ----------- | --- | ------- | -- |
 | AMD Radeon RX 7900 XT | 15.58s | 0.92 | ROCm | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
