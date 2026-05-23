@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/Irodori--TTS-Integrated-purple" />
   <img src="https://img.shields.io/badge/Irodori--TTS--Server-Integrated-purple" />
   <img src="https://img.shields.io/badge/API-OpenAI_Compatible-00A67E?logo=openai" />
-  <img src="https://img.shields.io/badge/Code%20License-MIT-green" />
+  [<img src="https://img.shields.io/badge/Code%20License-MIT-green" />](LICENSE)
 </p>
 
 AMD Radeon GPU（WSL2 + ROCm + ROCDXG）向けの GPU 加速 Irodori TTS オールインワン環境です。
