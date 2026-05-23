@@ -9,19 +9,6 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-ROCm_2.10-EE4C2C.svg?logo=pytorch)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-green.svg)](LICENSE)
 
-<p align="left">
-  <img src="https://img.shields.io/badge/WSL2-Supported-blue?logo=windows" />
-  <img src="https://img.shields.io/badge/Adrenalin-26.2.2-red?logo=amd" />
-  <img src="https://img.shields.io/badge/ROCm-7.2.1-orange?logo=amd" />
-  <img src="https://img.shields.io/badge/ROCDXG-Enabled-red?logo=amd" />
-  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker" />
-  <img src="https://img.shields.io/badge/PyTorch-ROCm_2.10-EE4C2C?logo=pytorch" />
-  <img src="https://img.shields.io/badge/Irodori--TTS-Integrated-purple" />
-  <img src="https://img.shields.io/badge/Irodori--TTS--Server-Integrated-purple" />
-  <img src="https://img.shields.io/badge/API-OpenAI_Compatible-00A67E?logo=openai" />
-  <img src="https://img.shields.io/badge/Code%20License-MIT-green" />
-</p>
-
 AMD Radeon GPU（WSL2 + ROCm + ROCDXG）向けの GPU 加速 Irodori TTS オールインワン環境です。
 
 以下の 3 サーバーを 1 コンテナで同時起動します。
