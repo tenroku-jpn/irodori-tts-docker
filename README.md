@@ -197,11 +197,11 @@ V3で10回試行しています。
 
 V3から追加されたウォーターマーク付与処理がCPUで大変重いです。(V2に比べて大幅に処理時間が増えます)
 
-本リポジトリから実行する場合
+本リポジトリから実行する場合：
 ```powershell
 docker exec -it irodori-tts uv run python /opt/Irodori-TTS/benchmark.py
 ```
-benchmark.pyだけをダウンロードして実行する場合
+benchmark.pyだけをダウンロードして実行する場合：
 ```powershell
 uv run python benchmark.py
 ```
