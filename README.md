@@ -9,8 +9,8 @@
   <img src="https://img.shields.io/badge/ROCDXG-Enabled-red?logo=amd" />
   <img src="https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker" />
   <img src="https://img.shields.io/badge/PyTorch-ROCm_2.10-EE4C2C?logo=pytorch" />
-  <img src="https://img.shields.io/badge/Irodori-TTS-Integrated-purple" />
-  <img src="https://img.shields.io/badge/Irodori-TTS-Server-Integrated-purple" />
+  <img src="https://img.shields.io/badge/Irodori--TTS-Integrated-purple" />
+  <img src="https://img.shields.io/badge/Irodori--TTS-Server-Integrated-purple" />
   <img src="https://img.shields.io/badge/API-OpenAI_Compatible-00A67E?logo=openai" />
   <img src="https://img.shields.io/badge/Irodori--TTS-Integrated-purple" />
   [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-green.svg)](LICENSE)
