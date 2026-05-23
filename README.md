@@ -2,6 +2,13 @@
 
 ### WSL2 + ROCm + ROCDXG + Docker + Web UI ×2 + API Server
 
+[![WSL2](https://img.shields.io/badge/WSL2-Supported-blue.svg?logo=windows)](https://learn.microsoft.com/ja-jp/windows/wsl/)
+[![Adrenalin](https://img.shields.io/badge/Adrenalin-26.2.2-red.svg?logo=amd)](https://rocm.docs.amd.com/projects/radeon-ryzen/en/docs-7.2.1/docs/install/installrad/wsl/howto_wsl.html)
+[![ROCm](https://img.shields.io/badge/ROCm-7.2.1-orange.svg?logo=amd)](https://rocm.docs.amd.com/projects/radeon-ryzen/en/docs-7.2.1/docs/install/installrad/wsl/howto_wsl.html)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker)](https://www.docker.com/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-ROCm_2.10-EE4C2C.svg?logo=pytorch)](https://pytorch.org/)
+[![License: MIT](https://img.shields.io/badge/Code%20License-MIT-green.svg)](LICENSE)
+
 <p align="left">
   <img src="https://img.shields.io/badge/WSL2-Supported-blue?logo=windows" />
   <img src="https://img.shields.io/badge/Adrenalin-26.2.2-red?logo=amd" />
