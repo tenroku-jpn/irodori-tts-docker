@@ -199,7 +199,7 @@ V3から追加されたウォーターマーク付与処理がCPUで大変重い
 
 本リポジトリから実行する場合：
 ```powershell
-docker exec -it irodori-tts uv run python /opt/Irodori-TTS/benchmark.py
+docker exec -it irodori-tts python /opt/Irodori-TTS/benchmark.py
 ```
 benchmark.pyだけをダウンロードして実行する場合：
 ```powershell
