@@ -208,6 +208,7 @@ uv run python benchmark.py
 | GPU | 平均推論時間 | RTF | ドライバ | OS |
 | --- | ----------- | --- | ------- | -- |
 | AMD Radeon RX 7900 XT | 15.58s | 0.92 | ROCm | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
+| AMD Radeon RX 7900 XT | 18.14s | 1.08 | ROCm | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
 
 ---
 
