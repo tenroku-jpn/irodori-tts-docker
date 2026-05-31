@@ -68,16 +68,6 @@ terminate_all() {
 }
 trap terminate_all SIGTERM
 
-# ============================================
-# ROCm / DXG / MIOPEN 環境
-# ============================================
-export HSA_ENABLE_DXG_DETECTION=1
-export MIOPEN_FIND_MODE=FAST
-export MIOPEN_USER_DB_PATH=/tmp/miopen-cache
-export PYTORCH_HIP_ALLOC_CONF="garbage_collection_threshold:0.8,max_split_size_mb:512"
-export TOKENIZERS_PARALLELISM=false
-export LD_LIBRARY_PATH=/opt/rocm/lib:/opt/rocm/lib64:/usr/lib/wsl/lib:$LD_LIBRARY_PATH
-
 mkdir -p /tmp/miopen-cache
 
 # ============================================

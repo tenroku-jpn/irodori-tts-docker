@@ -8,26 +8,86 @@ echo '5-1. System package install'
 echo '============================================'
  
 sudo apt update
-sudo apt install -y git wget curl build-essential cmake python3-setuptools python3-wheel python3-pip python3-dev pkg-config
+sudo apt install -y git wget curl build-essential cmake \
+                             python3-setuptools python3-wheel python3-pip python3-dev pkg-config \
+                             fzf
  
-echo
+CONFIG_DIR=config
+ 
+########################################
+# 1. Adrenaline 選択（fzf）
+########################################
+ 
+adrenalin=$(find "$CONFIG_DIR/Adrenaline" -maxdepth 1 -type f -name "*.env" \
+    | xargs -n1 basename | sed 's/.env$//' \
+    | fzf --prompt="Adrenaline バージョン > ")
+ 
+if [[ -z "$adrenalin" ]]; then
+    echo "キャンセルされました"
+    exit 1
+fi
+ 
+echo "選択: $adrenalin"
+source "$CONFIG_DIR/Adrenaline/$adrenalin.env"
+ 
+########################################
+# 2. GPU 選択（fzf）
+########################################
+ 
+gpu=$(find "$CONFIG_DIR/GPU" -maxdepth 1 -type f -name "*.env" \
+    | xargs -n1 basename | sed 's/.env$//' \
+    | fzf --prompt="GPU ハードウェア > ")
+ 
+if [[ -z "$gpu" ]]; then
+    echo "キャンセルされました"
+    exit 1
+fi
+ 
+echo "選択: $gpu"
+source "$CONFIG_DIR/GPU/$gpu.env"
+ 
+########################################
+# 3. config.env を生成
+########################################
+ 
+cat <<EOF > config.env
+ROCM_VERSION="$ROCM_VERSION"
+TORCH_VERSION="$TORCH_VERSION"
+VISION_VERSION="$VISION_VERSION"
+AUDIO_VERSION="$AUDIO_VERSION"
+TRITON_VERSION="$TRITON_VERSION"
+WHEEL_URL="$WHEEL_URL"
+GPU_FILE="$GPU_FILE"
+GPU_URL="$GPU_URL"
+ 
+GPU="$_GPU"
+ARCHITECTURE="$ARCHITECTURE"
+LLVM_TARGET="$LLVM_TARGET"
+SUPPORT="$SUPPORT"
+PACK_NAME="$PACK_NAME"
+ 
+EOF
+ 
+echo "config.env を生成しました:"
+cat config.env
+ 
 echo '============================================'
 echo '5-2. ROCm for WSL install'
 echo '============================================'
 # ROCm installation (based on AMD's official documentation)
 # Reference: https://rocm.docs.amd.com/projects/radeon-ryzen/en/docs-7.2.1/docs/install/installrad/native_linux/install-radeon.html
  
-if dpkg -l | grep -q rocm-core; then
+if dpkg -s rocm-core >/dev/null 2>&1; then
     echo "ROCm already installed. Skipping."
 else
     cd ~
         sudo apt update
-       
-    if [ ! -f amdgpu-install_7.2.1.70201-1_all.deb ]; then
-        wget https://repo.radeon.com/amdgpu-install/7.2.1/ubuntu/noble/amdgpu-install_7.2.1.70201-1_all.deb
+ 
+    if [ ! -f $GPU_FILE ]; then
+        wget $GPU_URL
     fi
  
-    sudo apt install -y ./amdgpu-install_7.2.1.70201-1_all.deb
+    sudo apt install -y "$GPU_FILE"
     sudo amdgpu-install -y --usecase=rocm --no-dkms
 fi
  
@@ -64,52 +124,35 @@ fi
  
 echo
 echo '============================================'
-echo '5-4. Apply ROCm environment (/etc/environment)'
-echo '============================================'
-# Apply ROCm runtime optimizations
-
-sudo sh -c 'cat >> /etc/profile' << 'EOF'
-export HSA_FORCE_FINE_GRAIN_PCIE=1
-export HSA_ENABLE_SDMA=0
-export HSA_ENABLE_DXG_DETECTION=1
-export MIOPEN_FIND_MODE=FAST
-export MIOPEN_USER_DB_PATH=/tmp/miopen-cache
-export PYTORCH_HIP_ALLOC_CONF="garbage_collection_threshold:0.8,max_split_size_mb:512"
-export OMP_NUM_THREADS=4
-export TOKENIZERS_PARALLELISM=false
-EOF
-
-source /etc/profile
-
-echo
-echo '============================================'
-echo '5-5. GPU detection'
+echo '5-4. GPU detection'
 echo '============================================'
  
 rocminfo | grep -i gfx || echo '[WARNING] GPU may not be detected correctly.'
  
 echo
 echo '============================================'
-echo '5-6. Docker availability check'
+echo '5-5. Docker availability check'
 echo '============================================'
  
-docker --version
-docker compose version
+ 
+if docker compose version >/dev/null 2>&1; then
+    COMPOSE="docker compose"
+else
+    COMPOSE="docker-compose"
+fi
  
 echo
 echo '============================================'
-echo '5-7. Docker build'
+echo '5-6. Docker build'
 echo '============================================'
- 
 cd ~/docker/irodori-tts-docker
-docker compose build --no-cache
+$COMPOSE build --no-cache
  
 echo
 echo '============================================'
-echo '5-8. Docker start'
+echo '5-7. Docker start'
 echo '============================================'
- 
-docker compose up -d
+$COMPOSE up -d
  
 echo
 echo '============================================'

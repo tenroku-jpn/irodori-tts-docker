@@ -3,70 +3,54 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      cache_from:
-        - irodori-tts:latest
-
+ 
     container_name: irodori-tts
     restart: unless-stopped
-
+ 
     ports:
       - "7860:7860"
       - "7861:7861"
       - "8088:8088"
-
+ 
     devices:
-      - /dev/dxg
-
+      - /dev/dxg:/dev/dxg
+ 
     group_add:
       - video
-
+ 
     volumes:
       # override パッチ
-      - ./overrides/infer.py:/opt/Irodori-TTS/infer.py
-      - ./overrides/gradio_app.py:/opt/Irodori-TTS/gradio_app.py
-      - ./overrides/gradio_app_voicedesign.py:/opt/Irodori-TTS/gradio_app_voicedesign.py
-      - ./overrides/irodori_tts/inference_runtime.py:/opt/Irodori-TTS/irodori_tts/inference_runtime.py
-      - ./overrides/irodori_tts/rocm_compat.py:/opt/Irodori-TTS/irodori_tts/rocm_compat.py
-
+      - ./overrides:/opt/Irodori-TTS/
+ 
       # benchmark
       - ./benchmark.py:/opt/Irodori-TTS/benchmark.py
-
+ 
       # ROCm ライブラリ
       - /opt/rocm:/opt/rocm
-      - /usr/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-x86_64:ro
-      - /lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu:ro
       - /usr/lib/wsl/lib:/usr/lib/wsl/lib:ro
-
+ 
       # キャッシュ
       - ./miopen-cache:/tmp/miopen-cache
       - ./hf-cache:/root/.cache/huggingface
-
+ 
       # 出力
       - ./outputs:/opt/Irodori-TTS/gradio_outputs
-
+ 
       # ログファイル
       - ./logs/irodori:/var/log/irodori
-
+ 
       # ボイスファイル
       - ./voices:/app/voices
-
-    environment:
-      - HSA_ENABLE_DXG_DETECTION=1
-      - MIOPEN_FIND_MODE=FAST
-      - MIOPEN_USER_DB_PATH=/tmp/miopen-cache
-      - PYTORCH_HIP_ALLOC_CONF=garbage_collection_threshold:0.8,max_split_size_mb:512
-      - OMP_NUM_THREADS=4
-      - TOKENIZERS_PARALLELISM=false
-      - LD_LIBRARY_PATH=/opt/rocm/lib:/opt/rocm/lib64:/opt/rocm/hip/lib:/usr/lib/wsl/lib
-
+ 
     security_opt:
       - seccomp=unconfined
+ 
     cap_add:
       - SYS_PTRACE
-
+ 
     ipc: host
     shm_size: "8g"
-
+ 
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:7860 || curl -f http://localhost:7861 || curl -f http://localhost:8088/v1/models"]
       interval: 10s

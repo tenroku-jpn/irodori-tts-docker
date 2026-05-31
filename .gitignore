@@ -44,6 +44,7 @@ outputs/
 *.ova
 *.ovf
 *.raw
+config.env
 
 # Compressed images
 *.img.gz
