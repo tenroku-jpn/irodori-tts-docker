@@ -20,6 +20,7 @@ CONFIG_DIR=config
  
 adrenalin=$(find "$CONFIG_DIR/Adrenaline" -maxdepth 1 -type f -name "*.env" \
     | xargs -n1 basename | sed 's/.env$//' \
+    | sort -V \
     | fzf --prompt="Adrenaline バージョン > ")
  
 if [[ -z "$adrenalin" ]]; then
@@ -36,6 +37,7 @@ source "$CONFIG_DIR/Adrenaline/$adrenalin.env"
  
 gpu=$(find "$CONFIG_DIR/GPU" -maxdepth 1 -type f -name "*.env" \
     | xargs -n1 basename | sed 's/.env$//' \
+    | sort -V \
     | fzf --prompt="GPU ハードウェア > ")
  
 if [[ -z "$gpu" ]]; then
