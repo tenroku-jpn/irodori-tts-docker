@@ -1,21 +1,21 @@
 FROM ubuntu:24.04
  
 ENV DEBIAN_FRONTEND=noninteractive
-ENV HSA_ENABLE_DXG_DETECTION=1 \
-    MIOPEN_FIND_MODE=FAST \
-    MIOPEN_USER_DB_PATH=/tmp/miopen-cache \
-    PYTORCH_HIP_ALLOC_CONF=garbage_collection_threshold:0.8,max_split_size_mb:512 \
-    OMP_NUM_THREADS=4 \
-    TOKENIZERS_PARALLELISM=false \
-    LD_LIBRARY_PATH=/opt/rocm/lib:/opt/rocm/lib64:/opt/rocm/hip/lib:/usr/lib/wsl/lib \
-    TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=TRUE \
-    PYTORCH_ENABLE_SDP_KERNELS=TRUE \
-    TRITON_CACHE_DIR=/tmp/triton-cache \
-    TORCHINDUCTOR_COMPILE_THREADS=4 \
-    PYTORCH_HIP_ALLOC_REUSE_GPU_MEMORY=1 \
-    FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE \
-    FLASH_ATTENTION_TRITON_AMD_AUTOTUNE=TRUE
- 
+ENV HSA_ENABLE_DXG_DETECTION=1
+ENV MIOPEN_FIND_MODE=FAST
+ENV MIOPEN_USER_DB_PATH=/tmp/miopen-cache
+ENV LD_LIBRARY_PATH="/opt/rocm/lib:/opt/rocm/lib64:/opt/rocm/hip/lib:/usr/lib/wsl/lib:/usr/lib/rocm:${LD_LIBRARY_PATH:-}"
+ENV PYTORCH_HIP_ALLOC_CONF="garbage_collection_threshold:0.8,max_split_size_mb:512"
+ENV OMP_NUM_THREADS=4
+ENV TOKENIZERS_PARALLELISM=false
+ENV TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=TRUE
+ENV PYTORCH_ENABLE_SDP_KERNELS=TRUE
+ENV TRITON_CACHE_DIR=/tmp/triton-cache
+ENV TORCHINDUCTOR_COMPILE_THREADS=4
+ENV PYTORCH_HIP_ALLOC_REUSE_GPU_MEMORY=1
+ENV FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE
+ENV FLASH_ATTENTION_TRITON_AMD_AUTOTUNE=TRUE
+
 COPY config.env /tmp/config.env
  
 RUN set -a \
@@ -27,8 +27,8 @@ RUN set -a \
 # ---------------------------------------------------------
 RUN apt-get update && apt-get install -y \
     python3 python3-pip python3-venv python3-setuptools python3-dev \
-    cmake pkg-config protobuf-compiler libprotobuf-dev dos2unix bash \
-    git wget ffmpeg libsndfile1 build-essential ca-certificates patch && \
+    cmake pkg-config protobuf-compiler libprotobuf-dev dos2unix bash curl \
+    git wget ffmpeg libsndfile1 build-essential ca-certificates patch iproute2 && \
     rm -rf /var/lib/apt/lists/*
 
 # ---------------------------------------------------------

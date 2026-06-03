@@ -27,10 +27,13 @@ services:
       - ./benchmark.py:/opt/Irodori-TTS/benchmark.py
 
       # ROCm ライブラリ
-      - /opt/rocm:/opt/rocm:ro
+      - /opt/rocm/lib:/usr/lib/rocm
+      - /usr/lib/wsl/lib/libdxcore.so:/opt/rocm/lib/libdxcore.so
       - /usr/lib/wsl/lib/libdxcore.so:/usr/lib/libdxcore.so
       - /opt/rocm/lib/librocdxg.so:/usr/lib/librocdxg.so
       - /opt/rocm/share/rocdxg/dids.conf:/usr/share/rocdxg/dids.conf
+      - /opt/rocm/lib/libhsa-runtime64.so.1:/opt/rocm/lib/libhsa-runtime64.so.1
+
 
       # キャッシュ
       - ./miopen-cache:/tmp/miopen-cache
@@ -44,7 +47,7 @@ services:
 
       # ボイスファイル
       - ./voices:/app/voices
-    
+
     devices:
       - /dev/dxg:/dev/dxg
 
@@ -58,7 +61,5 @@ services:
     shm_size: "8g"
 
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:7860 || curl -f http://localhost:7861 || curl -f http://localhost:8088/v1/models"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
+      disable: true
+

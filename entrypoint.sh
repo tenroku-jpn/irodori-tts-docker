@@ -1,108 +1,59 @@
 #!/bin/bash
-set -e
-
-# ============================================
-# systemd 風ユニット管理関数
-# ============================================
 
 LOG_DIR="/var/log/irodori"
 mkdir -p "$LOG_DIR"
 
-PID_DIR="/run/irodori"
-mkdir -p "$PID_DIR"
+CMD_WEBUI="python3 /opt/Irodori-TTS/gradio_app.py --server-name 0.0.0.0 --server-port 7860"
+CMD_VOICEDESIGN="python3 /opt/Irodori-TTS/gradio_app_voicedesign.py --server-name 0.0.0.0 --server-port 7861"
+CMD_API="python3 -m irodori_openai_tts --host 0.0.0.0 --port 8088"
 
-# systemd 風: サービス起動
-start_service() {
-    local name="$1"
-    local cmd="$2"
-    local log="$LOG_DIR/${name}.log"
-    local pidfile="$PID_DIR/${name}.pid"
-
-    echo "[systemd] Starting $name ..."
-    eval "$cmd" >> "$log" 2>&1 &
-    local pid=$!
-    echo $pid > "$pidfile"
-    echo "[systemd] $name started with PID $pid"
+start_webui() {
+    echo "[systemd] Starting webui..."
+    pkill -f "gradio_app.py" 2>/dev/null
+    $CMD_WEBUI >> "$LOG_DIR/webui.log" 2>&1 &
 }
 
-# systemd 風: サービス停止
-stop_service() {
-    local name="$1"
-    local pidfile="$PID_DIR/${name}.pid"
-
-    if [[ -f "$pidfile" ]]; then
-        local pid=$(cat "$pidfile")
-        echo "[systemd] Stopping $name (PID $pid)"
-        kill "$pid" 2>/dev/null || true
-        wait "$pid" 2>/dev/null || true
-        rm -f "$pidfile"
-    fi
+start_voicedesign() {
+    echo "[systemd] Starting voicedesign..."
+    pkill -f "gradio_app_voicedesign.py" 2>/dev/null
+    $CMD_VOICEDESIGN >> "$LOG_DIR/voicedesign.log" 2>&1 &
 }
 
-# systemd 風: サービス監視
-monitor_service() {
-    local name="$1"
-    local pidfile="$PID_DIR/${name}.pid"
-
-    if [[ ! -f "$pidfile" ]]; then
-        echo "[systemd] $name pidfile missing → restarting"
-        return 1
-    fi
-
-    local pid=$(cat "$pidfile")
-    if ! kill -0 "$pid" 2>/dev/null; then
-        echo "[systemd] $name crashed → restarting"
-        return 1
-    fi
-
-    return 0
+start_api() {
+    echo "[systemd] Starting api..."
+    pkill -f "irodori_openai_tts" 2>/dev/null
+    $CMD_API >> "$LOG_DIR/api.log" 2>&1 &
 }
 
-# systemd 風: SIGTERM handler
-terminate_all() {
-    echo "[systemd] SIGTERM received → stopping all services..."
-    stop_service "webui"
-    stop_service "voicedesign"
-    stop_service "api"
-    exit 0
+# ポート監視（軽量）
+port_alive() {
+    ss -ltn | grep -Fq ":$1"
 }
-trap terminate_all SIGTERM
 
-mkdir -p /tmp/miopen-cache
+# --- 起動 ---
+start_webui
+start_voicedesign
+start_api
 
-# ============================================
-# systemd 風: サービス起動
-# ============================================
+echo "[systemd] Waiting 60 seconds for services to fully start..."
+sleep 60   # ← ★ これが決定的に重要
 
-start_service "webui" \
-    "python3 /opt/Irodori-TTS/gradio_app.py --server-name 0.0.0.0 --server-port 7860"
-
-start_service "voicedesign" \
-    "python3 /opt/Irodori-TTS/gradio_app_voicedesign.py --server-name 0.0.0.0 --server-port 7861"
-
-start_service "api" \
-    "python3 -m irodori_openai_tts --host 0.0.0.0 --port 8088"
-
-echo '[systemd] All services started.'
-
-# ============================================
-# systemd 風: Watchdog（プロセス監視）
-# ============================================
+# --- 監視ループ ---
 while true; do
-    sleep 2
+    sleep 10
 
-    if ! monitor_service "webui"; then
-        start_service "webui" \
-            "python3 /opt/Irodori-TTS/gradio_app.py --server-name 0.0.0.0 --server-port 7860"
+    if ! port_alive 7860; then
+        echo "[systemd] webui dead → restart"
+        start_webui
     fi
 
-    if ! monitor_service "voicedesign"; then
-        start_service "voicedesign" \
-            "python3 /opt/Irodori-TTS/gradio_app_voicedesign.py --server-name 0.0.0.0 --server-port 7861"
+    if ! port_alive 7861; then
+        echo "[systemd] voicedesign dead → restart"
+        start_voicedesign
     fi
 
-    if ! monitor_service "api"; then
-        start_service "api" \
-            "python3 -m irodori_openai_tts --host 0.0.0.0 --port 8088"
+    if ! port_alive 8088; then
+        echo "[systemd] api dead → restart"
+        start_api
     fi
 done
