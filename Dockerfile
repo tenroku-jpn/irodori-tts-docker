@@ -1,7 +1,7 @@
 FROM ubuntu:24.04
  
 ENV DEBIAN_FRONTEND=noninteractive
-ENV HSA_ENABLE_DXG_DETECTION=TRUE \
+ENV HSA_ENABLE_DXG_DETECTION=1 \
     MIOPEN_FIND_MODE=FAST \
     MIOPEN_USER_DB_PATH=/tmp/miopen-cache \
     PYTORCH_HIP_ALLOC_CONF=garbage_collection_threshold:0.8,max_split_size_mb:512 \
@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install -y \
     cmake pkg-config protobuf-compiler libprotobuf-dev dos2unix bash \
     git wget ffmpeg libsndfile1 build-essential ca-certificates patch && \
     rm -rf /var/lib/apt/lists/*
- 
+
 # ---------------------------------------------------------
 # Python venv
 # ---------------------------------------------------------

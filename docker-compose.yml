@@ -3,59 +3,60 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
- 
+
     container_name: irodori-tts
     restart: unless-stopped
- 
+
     ports:
       - "7860:7860"
       - "7861:7861"
       - "8088:8088"
- 
-    devices:
-      - /dev/dxg:/dev/dxg
- 
+
     group_add:
       - video
- 
+
     volumes:
       # override パッチ
       - ./overrides/infer.py:/opt/Irodori-TTS/infer.py
       - ./overrides/gradio_app.py:/opt/Irodori-TTS/gradio_app.py
       - ./overrides/gradio_app_voicedesign.py:/opt/Irodori-TTS/gradio_app_voicedesign.py
-      - ./overrides/benchmark.py:/opt/Irodori-TTS/benchmark.py
       - ./overrides/irodori_tts/inference_runtime.py:/opt/Irodori-TTS/irodori_tts/inference_runtime.py
       - ./overrides/irodori_tts/rocm_compat.py:/opt/Irodori-TTS/irodori_tts/rocm_compat.py
- 
+
       # benchmark
       - ./benchmark.py:/opt/Irodori-TTS/benchmark.py
- 
+
       # ROCm ライブラリ
-      - /opt/rocm:/opt/rocm
-      - /usr/lib/wsl/lib:/usr/lib/wsl/lib:ro
- 
+      - /opt/rocm:/opt/rocm:ro
+      - /usr/lib/wsl/lib/libdxcore.so:/usr/lib/libdxcore.so
+      - /opt/rocm/lib/librocdxg.so:/usr/lib/librocdxg.so
+      - /opt/rocm/share/rocdxg/dids.conf:/usr/share/rocdxg/dids.conf
+
       # キャッシュ
       - ./miopen-cache:/tmp/miopen-cache
       - ./hf-cache:/root/.cache/huggingface
- 
+
       # 出力
       - ./outputs:/opt/Irodori-TTS/gradio_outputs
- 
+
       # ログファイル
       - ./logs/irodori:/var/log/irodori
- 
+
       # ボイスファイル
       - ./voices:/app/voices
- 
-    security_opt:
-      - seccomp=unconfined
- 
+    
+    devices:
+      - /dev/dxg:/dev/dxg
+
     cap_add:
       - SYS_PTRACE
- 
+
+    security_opt:
+      - seccomp=unconfined
+
     ipc: host
     shm_size: "8g"
- 
+
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:7860 || curl -f http://localhost:7861 || curl -f http://localhost:8088/v1/models"]
       interval: 10s

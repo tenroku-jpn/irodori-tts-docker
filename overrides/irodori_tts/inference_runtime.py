@@ -49,37 +49,62 @@ def _is_xpu_available() -> bool:
 
 def resolve_runtime_device(device: str | torch.device) -> torch.device:
     resolved = torch.device(device)
+    # CPU
     if resolved.type == "cpu":
         return resolved
+
+    # NVIDIA CUDA
     if resolved.type == "cuda":
         if not torch.cuda.is_available():
             raise ValueError("CUDA device requested but torch.cuda.is_available() is False.")
         return resolved
+
+    # AMD ROCm (HIP)
+    if resolved.type == "hip":
+        if torch.version.hip is None:
+            raise ValueError("HIP device requested but torch.version.hip is None.")
+        return resolved
+
+    # Apple MPS
     if resolved.type == "mps":
         if resolved.index is not None:
             raise ValueError("MPS device index is not supported. Use 'mps'.")
         if not _is_mps_available():
             raise ValueError("MPS device requested but torch.backends.mps.is_available() is False.")
         return torch.device("mps")
+
+    # Intel XPU
     if resolved.type == "xpu":
         if resolved.index is not None:
             raise ValueError("XPU device index is not supported. Use 'xpu'.")
         if not _is_xpu_available():
             raise ValueError("XPU device requested but torch.xpu.is_available() is False.")
         return torch.device("xpu")
-    raise ValueError(f"Unsupported inference device={resolved!s}. Expected one of: cpu, cuda, mps, xpu.")
-
 
 def list_available_runtime_devices() -> list[str]:
     devices: list[str] = []
+
+    # NVIDIA CUDA
     if torch.cuda.is_available():
         devices.append("cuda")
+
+    # AMD ROCm (HIP)
+    if getattr(torch.version, "hip", None) is not None:
+        devices.append("hip")
+
+    # Apple MPS
     if _is_mps_available():
         devices.append("mps")
+
+    # Intel XPU
     if _is_xpu_available():
         devices.append("xpu")
+
+    # Always include CPU
     devices.append("cpu")
+
     return devices
+
 
 
 def default_runtime_device() -> str:
@@ -88,22 +113,42 @@ def default_runtime_device() -> str:
 
 def list_available_runtime_precisions(device: str | torch.device) -> list[str]:
     resolved = resolve_runtime_device(device)
-    if resolved.type in ("cuda", "xpu"):
+
+    # NVIDIA CUDA
+    if resolved.type == "cuda":
         return ["fp32", "bf16"]
+
+    # AMD ROCm (HIP)
+    if resolved.type == "hip":
+        return ["fp32", "fp16", "bf16"]
+
+    # Intel XPU
+    if resolved.type == "xpu":
+        return ["fp32", "bf16"]
+
+    # CPU / MPS
     return ["fp32"]
 
 
 def _sync_device(device: torch.device) -> None:
     if device.type == "cuda":
         torch.cuda.synchronize(device)
+
+    elif device.type == "hip":
+        hip = getattr(torch, "hip", None)
+        if hip is not None and hasattr(hip, "synchronize"):
+            hip.synchronize()
+
     elif device.type == "mps":
         mps = getattr(torch, "mps", None)
         if mps is not None and hasattr(mps, "synchronize"):
             mps.synchronize()
+
     elif device.type == "xpu":
         xpu = getattr(torch, "xpu", None)
         if xpu is not None and hasattr(xpu, "synchronize"):
             xpu.synchronize()
+
 
 
 def _sync_devices(*devices: torch.device) -> None:
@@ -292,13 +337,35 @@ def _move_inference_module(
 
 def resolve_runtime_dtype(*, precision: str, device: torch.device) -> torch.dtype:
     mode = str(precision).strip().lower()
+
     if mode == "fp32":
         return torch.float32
+
     if mode == "bf16":
-        if device.type not in ("cuda", "xpu"):
-            raise ValueError("precision='bf16' currently requires CUDA or XPU device.")
-        return torch.bfloat16
-    raise ValueError(f"Unsupported precision={precision!r}. Expected one of: fp32, bf16.")
+        # NVIDIA CUDA
+        if device.type == "cuda":
+            return torch.bfloat16
+
+        # AMD ROCm (HIP)
+        if device.type == "hip":
+            return torch.bfloat16
+
+        # Intel XPU
+        if device.type == "xpu":
+            return torch.bfloat16
+
+        raise ValueError("precision='bf16' requires CUDA, HIP, or XPU device.")
+
+    if mode == "fp16":
+        # AMD ROCm supports fp16
+        if device.type == "hip":
+            return torch.float16
+        # CUDA supports fp16 too
+        if device.type == "cuda":
+            return torch.float16
+        raise ValueError("precision='fp16' requires CUDA or HIP device.")
+
+    raise ValueError(f"Unsupported precision={precision!r}. Expected one of: fp32, fp16, bf16.")
 
 
 def resolve_cfg_scales(
