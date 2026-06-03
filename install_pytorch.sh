@@ -22,10 +22,10 @@ case "$ROCM_VERSION" in
         ;;
     "7.11.0"|"7.12.0"|"7.13.0")
                 pip install --index-url "$WHEEL_URL/$PACK_NAME/" \
-                        "torch==$TORCH_VERSION" \
-                        "torchaudio==$AUDIO_VERSION" \
-                        "torchvision==$VISION_VERSION" \
-                        "triton==$TRITON_VERSION"
+                        "torch==$TORCH_VERSION+rocm$ROCM_VERSION" \
+                        "torchaudio==$AUDIO_VERSION+rocm$ROCM_VERSION" \
+                        "torchvision==$VISION_VERSION+rocm$ROCM_VERSION" \
+                        "triton==$TRITON_VERSION+rocm$ROCM_VERSION"
         ;;
     *)
         echo "Unknown ROCm version: $ROCM_VERSION"

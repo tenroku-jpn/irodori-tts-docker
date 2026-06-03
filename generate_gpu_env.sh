@@ -8,17 +8,16 @@ mkdir -p "$OUTDIR"
  
 # パック定義
 declare -A PACKS=(
-    ["gfx110X-all"]="gfx1100 gfx1101"
-    ["gfx110X-dgpu"]="gfx1100"
-    ["gfx103X-all"]="gfx1030 gfx1031"
+    ["gfx110X-all"]="gfx1100,gfx1101"
+    ["gfx103X-all"]="gfx1030,gfx1031"
     ["gfx1150"]="gfx1150"
     ["gfx1151"]="gfx1151"
     ["gfx1152"]="gfx1152"
     ["gfx90a"]="gfx90a"
     ["gfx908"]="gfx908"
-    ["gfx120X-all"]="gfx1200 gfx1201"
-    ["gfx90X-dcgpu"]="gfx90a gfx908"
-    ["gfx94X-dcgpu"]="gfx942 gfx940"
+    ["gfx120X-all"]="gfx1200,gfx1201"
+    ["gfx90X-dcgpu"]="gfx90a,gfx908"
+    ["gfx94X-dcgpu"]="gfx942,gfx940"
     ["gfx950-dcgpu"]="gfx950"
 )
  
@@ -34,12 +33,14 @@ normalize_key() {
 detect_pack() {
     local gfx="$1"
     for pack in "${!PACKS[@]}"; do
-        for g in ${PACKS[$pack]}; do
+        IFS=',' read -ra arr <<< "${PACKS[$pack]}"
+        for g in "${arr[@]}"; do
             [[ "$g" == "$gfx" ]] && echo "$pack" && return
         done
     done
-    echo "$gfx"   # unknown → そのまま gfxXXXX を返す
+    echo "$gfx"
 }
+
  
 echo "[INFO] Fetching AMD GPU table..."
 html=$(curl -s "$URL" || echo "")
