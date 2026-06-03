@@ -31,11 +31,13 @@ Windows で `setup.bat` を実行するだけで、
 Windows 側で以下を済ませてください。
 ---
 
-## ✔ 1. AMD Software: Adrenalin Edition 26.2.2をインストール
+## ✔ 1. AMD Software: Adrenalin Editionをインストール
 
-AMD Software: Adrenalin Edition 26.2.2:
-
-[https://drivers.amd.com/drivers/whql-amd-software-adrenalin-edition-26.2.2-win11-c.exe](https://drivers.amd.com/drivers/whql-amd-software-adrenalin-edition-26.2.2-win11-c.exe)
+[AMD Software: Adrenalin Edition 26.2.2](https://drivers.amd.com/drivers/whql-amd-software-adrenalin-edition-26.2.2-win11-c.exe)
+[AMD Software: Adrenalin Edition 26.3.1](https://drivers.amd.com/drivers/whql-amd-software-adrenalin-edition-26.3.1-win11-c.exe)
+[AMD Software: Adrenalin Edition 26.5.1](https://drivers.amd.com/drivers/whql-amd-software-adrenalin-edition-26.5.1-win11-c.exe)
+[AMD Software: Adrenalin Edition 26.5.2](https://drivers.amd.com/drivers/whql-amd-software-adrenalin-edition-26.5.2-win11-c.exe)
+[AMD Software: Adrenalin Edition 26.6.1](https://drivers.amd.com/drivers/whql-amd-software-adrenalin-edition-26.2.2-win11-c.exe)
 
 ---
 
