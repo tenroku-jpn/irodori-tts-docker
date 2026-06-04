@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import json
+import os
 import platform
-import subprocess
 import time
+from contextlib import redirect_stdout, redirect_stderr
 
 import torch
 from huggingface_hub import hf_hub_download
@@ -54,22 +55,25 @@ def load_runtime(precision: str):
 
 
 def infer_once(runtime, text, decode_mode):
-    result = runtime.synthesize(
-        SamplingRequest(
-            text=text,
-            no_ref=True,
-            num_candidates=1,
-            decode_mode=decode_mode,
-            num_steps=NUM_STEPS,
-            cfg_scale_text=3.0,
-            cfg_scale_caption=3.0,
-            cfg_scale_speaker=5.0,
-            cfg_guidance_mode="independent",
-            t_schedule_mode="linear",
-            sway_coeff=-1.0,
-        ),
-        log_fn=None,
-    )
+    # silentcipher等のうるさいprintを抑制
+    with open(os.devnull, "w") as devnull:
+        with redirect_stdout(devnull), redirect_stderr(devnull):
+            result = runtime.synthesize(
+                SamplingRequest(
+                    text=text,
+                    no_ref=True,
+                    num_candidates=1,
+                    decode_mode=decode_mode,
+                    num_steps=NUM_STEPS,
+                    cfg_scale_text=3.0,
+                    cfg_scale_caption=3.0,
+                    cfg_scale_speaker=5.0,
+                    cfg_guidance_mode="independent",
+                    t_schedule_mode="linear",
+                    sway_coeff=-1.0,
+                ),
+                log_fn=None,
+            )
 
     return result.audio, result.sample_rate
 
@@ -89,9 +93,7 @@ def benchmark(runtime, decode_mode):
 
     avg = sum(times) / len(times)
 
-    # audio: Tensor [channels, samples]
     duration = audio.shape[-1] / sr
-
     rtf = avg / duration
 
     return {
@@ -99,6 +101,7 @@ def benchmark(runtime, decode_mode):
         "audio_sec": duration,
         "rtf": rtf,
     }
+
 
 def main():
     results = []
@@ -142,6 +145,7 @@ def main():
 
     print("\nJSON:")
     print(json.dumps(results, indent=2, ensure_ascii=False))
+
 
 if __name__ == "__main__":
     main()
