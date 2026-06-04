@@ -207,10 +207,12 @@ benchmark.pyだけをダウンロードして実行する場合：
 ```powershell
 uv run python benchmark.py
 ```
-| GPU | 平均推論時間 | RTF | ドライバ | OS |
-| --- | ----------- | --- | ------- | -- |
-| AMD Radeon RX 7900 XT | 15.58s | 0.92 | ROCm | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
-| AMD Radeon RX 7900 XT | 18.14s | 1.08 | ROCm | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
+| GPU | Precision | decode | avg(sec) | RTF | Backend | PyTorch | OS |
+|------|------|------|------:|------:|------|------|------|
+| AMD Radeon RX 7900 XT | fp32 | sequential | 3.37 | 0.323 | ROCm | 2.10.0+rocm7.2.1.gitb07cec22 | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
+| AMD Radeon RX 7900 XT | fp32 | batch | 3.37 | 0.323 | ROCm | 2.10.0+rocm7.2.1.gitb07cec22 | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
+| AMD Radeon RX 7900 XT | bf16 | sequential | 0.97 | 0.093 | ROCm | 2.10.0+rocm7.2.1.gitb07cec22 | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
+| AMD Radeon RX 7900 XT | bf16 | batch | 0.96 | 0.091 | ROCm | 2.10.0+rocm7.2.1.gitb07cec22 | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
 
 ---
 

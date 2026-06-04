@@ -128,7 +128,10 @@ echo
 echo '============================================'
 echo '5-4. GPU detection'
 echo '============================================'
- 
+
+grep -q "HSA_ENABLE_DXG_DETECTION=1" ~/.bashrc || echo 'export HSA_ENABLE_DXG_DETECTION=1' >> ~/.bashrc
+source ~/.bashrc
+
 rocminfo | grep -i gfx || echo '[WARNING] GPU may not be detected correctly.'
  
 echo
