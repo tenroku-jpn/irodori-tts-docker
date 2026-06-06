@@ -33,6 +33,7 @@ Windows 側で以下を済ませてください。
 
 ## ✔ 1. AMD Software: Adrenalin Editionをインストール
 必ず以下のリンク先にあるインストーラでインストールしてください。
+Adrenalin 26.5.2以降はプレビュー版であるROCm 7.13.0が使用できます。
 
 - [AMD Software: Adrenalin Edition 26.2.2](https://www.amd.com/ja/resources/support-articles/release-notes/RN-RAD-WIN-26-2-2.html)
 - [AMD Software: Adrenalin Edition 26.3.1](https://www.amd.com/ja/resources/support-articles/release-notes/RN-RAD-WIN-26-3-1.html)
