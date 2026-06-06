@@ -32,12 +32,13 @@ Windows 側で以下を済ませてください。
 ---
 
 ## ✔ 1. AMD Software: Adrenalin Editionをインストール
+必ず以下のリンク先にあるインストーラでインストールしてください。
 
-[AMD Software: Adrenalin Edition 26.2.2](https://drivers.amd.com/drivers/whql-amd-software-adrenalin-edition-26.2.2-win11-c.exe)
-[AMD Software: Adrenalin Edition 26.3.1](https://drivers.amd.com/drivers/whql-amd-software-adrenalin-edition-26.3.1-win11-c.exe)
-[AMD Software: Adrenalin Edition 26.5.1](https://drivers.amd.com/drivers/whql-amd-software-adrenalin-edition-26.5.1-win11-c.exe)
-[AMD Software: Adrenalin Edition 26.5.2](https://drivers.amd.com/drivers/whql-amd-software-adrenalin-edition-26.5.2-win11-c.exe)
-[AMD Software: Adrenalin Edition 26.6.1](https://drivers.amd.com/drivers/whql-amd-software-adrenalin-edition-26.2.2-win11-c.exe)
+-[AMD Software: Adrenalin Edition 26.2.2](https://www.amd.com/ja/resources/support-articles/release-notes/RN-RAD-WIN-26-2-2.html)
+-[AMD Software: Adrenalin Edition 26.3.1](https://www.amd.com/ja/resources/support-articles/release-notes/RN-RAD-WIN-26-3-1.html)
+-[AMD Software: Adrenalin Edition 26.5.1](https://www.amd.com/ja/resources/support-articles/release-notes/RN-RAD-WIN-26-5-1.html)
+-[AMD Software: Adrenalin Edition 26.5.2](https://www.amd.com/ja/resources/support-articles/release-notes/RN-RAD-WIN-26-5-2.html)
+-[AMD Software: Adrenalin Edition 26.6.1](https://www.amd.com/ja/resources/support-articles/release-notes/RN-RAD-WIN-26-6-1.html)
 
 ---
 

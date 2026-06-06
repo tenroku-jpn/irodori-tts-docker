@@ -32,7 +32,6 @@ from .text_normalization import normalize_text
 from .tokenizer import PretrainedTextTokenizer
 from .watermark import SilentCipherWatermarker
 
-
 def _is_mps_available() -> bool:
     backends = getattr(torch, "backends", None)
     if backends is None or not hasattr(backends, "mps"):
@@ -301,8 +300,9 @@ def _maybe_compile_inference_model(
         return model
     if not hasattr(torch, "compile"):
         raise RuntimeError("compile_model=True requires torch.compile (PyTorch 2+).")
+    
     compile_kwargs = {"dynamic": bool(dynamic)}
-    model.encode_conditions = torch.compile(model.encode_conditions, **compile_kwargs)
+    odel.encode_conditions = torch.compile(model.encode_conditions, **compile_kwargs)
     model.build_context_kv_cache = torch.compile(model.build_context_kv_cache, **compile_kwargs)
     model.forward_with_encoded_conditions = torch.compile(
         model.forward_with_encoded_conditions,
