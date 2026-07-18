@@ -20,10 +20,10 @@ CONFIG_DIR=config
  
 cd ~/docker/irodori-tts-docker
 
-adrenalin=$(find "$CONFIG_DIR/Adrenaline" -maxdepth 1 -type f -name "*.env" \
+adrenalin=$(find "$CONFIG_DIR/Adrenalin" -maxdepth 1 -type f -name "*.env" \
     | xargs -n1 basename | sed 's/.env$//' \
     | sort -V \
-    | fzf --prompt="Adrenaline バージョン > ")
+    | fzf --prompt="Adrenalin バージョン > ")
  
 if [[ -z "$adrenalin" ]]; then
     echo "キャンセルされました"
@@ -31,7 +31,7 @@ if [[ -z "$adrenalin" ]]; then
 fi
  
 echo "選択: $adrenalin"
-source "$CONFIG_DIR/Adrenaline/$adrenalin.env"
+source "$CONFIG_DIR/Adrenalin/$adrenalin.env"
  
 ########################################
 # 2. GPU 選択（fzf）
