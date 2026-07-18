@@ -18,6 +18,8 @@ CONFIG_DIR=config
 # 1. Adrenaline 選択（fzf）
 ########################################
  
+cd ~/docker/irodori-tts-docker
+
 adrenalin=$(find "$CONFIG_DIR/Adrenaline" -maxdepth 1 -type f -name "*.env" \
     | xargs -n1 basename | sed 's/.env$//' \
     | sort -V \
@@ -89,7 +91,7 @@ else
         wget $GPU_URL
     fi
  
-    sudo apt install -y "$GPU_FILE"
+    sudo apt install -y "./$GPU_FILE"
     sudo amdgpu-install -y --usecase=rocm --no-dkms
 fi
  
