@@ -24,8 +24,6 @@ RUN apt-get update && apt-get install -y \
     cmake pkg-config protobuf-compiler libprotobuf-dev dos2unix bash curl \
     git wget ffmpeg libsndfile1 build-essential ca-certificates patch iproute2 && \
     rm -rf /var/lib/apt/lists/*
-
-RUN pip3 install setuptools wheel
  
 # ---------------------------------------------------------
 # SentencePiece 0.1.99
