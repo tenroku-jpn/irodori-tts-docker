@@ -79,7 +79,7 @@ echo "config.env を生成しました:"
 cat config.env
  
 echo '============================================'
-echo '5-2. ROCm for WSL install'
+echo '5-2. ROCm for WSL install                   '
 echo '============================================'
 # ROCm installation (based on AMD's official documentation)
 # Reference: https://rocm.docs.amd.com/projects/radeon-ryzen/en/docs-7.2.1/docs/install/installrad/native_linux/install-radeon.html
@@ -126,7 +126,7 @@ fi
  
 echo
 echo '============================================'
-echo '5-3. Build librocdxg'
+echo '5-3. Build librocdxg                        '
 echo '============================================'
 # Build librocdxg, the DXG bridge library required by ROCm on WSL2
 # Reference: https://github.com/ROCm/librocdxg
@@ -164,7 +164,7 @@ source /etc/profile.d/rocdxg-amd-smi-lib.sh
  
 echo
 echo '============================================'
-echo '5-4. GPU detection'
+echo '5-4. GPU detection                          '
 echo '============================================'
  
 export HSA_ENABLE_DXG_DETECTION=1
@@ -175,10 +175,156 @@ grep -q "HSA_ENABLE_DXG_DETECTION=1" ~/.bashrc || \
 if ! rocminfo | grep -iq gfx; then
     echo '[WARNING] GPU may not be detected correctly.'
 fi
+
+echo
+echo '============================================'
+echo '5-5. make docker-compose.yml                '
+echo '============================================'
+ 
+if dpkg --compare-versions "$ROCM_VERSION_SHORT" ge "7.9"; then
+    echo "Preview series (7.9+) 用 docker-compose.yml を生成"
+
+    cat > docker-compose.yml << 'EOF'
+services:
+  irodori:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: irodori-tts
+    restart: unless-stopped
+
+    ports:
+      - "7860:7860"
+      - "7861:7861"
+      - "8088:8088"
+
+    group_add:
+      - video
+
+    volumes:
+      # override パッチ
+      - ./overrides/infer.py:/opt/Irodori-TTS/infer.py
+      - ./overrides/gradio_app.py:/opt/Irodori-TTS/gradio_app.py
+      - ./overrides/gradio_app_voicedesign.py:/opt/Irodori-TTS/gradio_app_voicedesign.py
+      - ./overrides/irodori_tts/inference_runtime.py:/opt/Irodori-TTS/irodori_tts/inference_runtime.py
+      - ./overrides/irodori_tts/rocm_compat.py:/opt/Irodori-TTS/irodori_tts/rocm_compat.py
+
+      # benchmark
+      - ./benchmark.py:/opt/Irodori-TTS/benchmark.py
+
+      # ROCm ライブラリ (7.9+ / core-7.14 系)
+      - /opt/rocm/core-${ROCM_VERSION_SHORT}/lib/llvm/amdgcn/:/opt/rocm/amdgcn/
+      - /opt/rocm/core-${ROCM_VERSION_SHORT}/bin/:/opt/rocm/bin/
+      - /opt/rocm/core-${ROCM_VERSION_SHORT}/:/opt/rocm/core/
+      - /opt/rocm/core-${ROCM_VERSION_SHORT}/:/opt/rocm/core-7/
+      - /opt/rocm/core-${ROCM_VERSION_SHORT}/include/:/opt/rocm/include/
+      - /opt/rocm/core-${ROCM_VERSION_SHORT}/lib/:/opt/rocm/lib/
+      - /opt/rocm/core-${ROCM_VERSION_SHORT}/libexec/:/opt/rocm/libexec/
+      - /opt/rocm/core-${ROCM_VERSION_SHORT}/lib/llvm/:/opt/rocm/llvm/
+      - /opt/rocm/core-${ROCM_VERSION_SHORT}/share/:/opt/rocm/share/
+      - /usr/lib/wsl/lib/:/usr/lib/wsl/lib/
+
+      # キャッシュ
+      - ./miopen-cache:/tmp/miopen-cache
+      - ./hf-cache:/root/.cache/huggingface
+
+      # 出力
+      - ./outputs:/opt/Irodori-TTS/gradio_outputs
+
+      # ログファイル
+      - ./logs/irodori:/var/log/irodori
+
+      # ボイスファイル
+      - ./voices:/app/voices
+
+    devices:
+      - /dev/dxg:/dev/dxg
+
+    cap_add:
+      - SYS_PTRACE
+
+    security_opt:
+      - seccomp=unconfined
+
+    ipc: host
+    shm_size: "8g"
+
+    healthcheck:
+      disable: true
+EOF
+
+else
+    echo "Production series (7.0 - 7.8) 用 docker-compose.yml を生成"
+
+    cat > docker-compose.yml << 'EOF'
+services:
+  irodori:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: irodori-tts
+    restart: unless-stopped
+
+    ports:
+      - "7860:7860"
+      - "7861:7861"
+      - "8088:8088"
+
+    group_add:
+      - video
+      - render
+
+    volumes:
+      # override パッチ
+      - ./overrides/infer.py:/opt/Irodori-TTS/infer.py
+      - ./overrides/gradio_app.py:/opt/Irodori-TTS/gradio_app.py
+      - ./overrides/gradio_app_voicedesign.py:/opt/Irodori-TTS/gradio_app_voicedesign.py
+      - ./overrides/irodori_tts/inference_runtime.py:/opt/Irodori-TTS/irodori_tts/inference_runtime.py
+      - ./overrides/irodori_tts/rocm_compat.py:/opt/Irodori-TTS/irodori_tts/rocm_compat.py
+
+      # benchmark
+      - ./benchmark.py:/opt/Irodori-TTS/benchmark.py
+
+      # ROCm ライブラリ (7.0〜7.8 / ざっくり版)
+      - /opt/rocm/lib/:/opt/rocm/lib/
+      - /usr/lib/wsl/lib/:/usr/lib/wsl/lib/
+
+      # キャッシュ
+      - ./miopen-cache:/tmp/miopen-cache
+      - ./hf-cache:/root/.cache/huggingface
+
+      # 出力
+      - ./outputs:/opt/Irodori-TTS/gradio_outputs
+
+      # ログファイル
+      - ./logs/irodori:/var/log/irodori
+
+      # ボイスファイル
+      - ./voices:/app/voices
+
+    devices:
+      - /dev/dxg:/dev/dxg
+
+    cap_add:
+      - SYS_PTRACE
+
+    security_opt:
+      - seccomp=unconfined
+
+    ipc: host
+    shm_size: "8g"
+
+    healthcheck:
+      disable: true
+EOF
+
+
  
 echo
 echo '============================================'
-echo '5-5. Docker availability check'
+echo '5-6. Docker availability check'
 echo '============================================'
  
  
@@ -190,14 +336,14 @@ fi
  
 echo
 echo '============================================'
-echo '5-6. Docker build'
+echo '5-7. Docker build'
 echo '============================================'
 cd ~/docker/irodori-tts-docker
 $COMPOSE build --no-cache
  
 echo
 echo '============================================'
-echo '5-7. Docker start'
+echo '5-8. Docker start'
 echo '============================================'
 $COMPOSE up -d
  
