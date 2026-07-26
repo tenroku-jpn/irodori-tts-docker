@@ -4,23 +4,17 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV HSA_ENABLE_DXG_DETECTION=1
 ENV MIOPEN_FIND_MODE=FAST
 ENV MIOPEN_USER_DB_PATH=/tmp/miopen-cache
-ENV LD_LIBRARY_PATH="/opt/rocm/lib:/opt/rocm/lib64:/opt/rocm/hip/lib:/usr/lib/wsl/lib:/usr/lib/rocm:${LD_LIBRARY_PATH:-}"
+ENV LD_LIBRARY_PATH=/opt/rocm/lib:/opt/rocm/lib64:/opt/rocm/hip/lib:/usr/lib/wsl/lib:/usr/lib/rocm
 ENV PYTORCH_HIP_ALLOC_CONF="garbage_collection_threshold:0.8,max_split_size_mb:512"
+ENV TORCH_BLAS_PREFER_HIPBLASLT=1
 ENV OMP_NUM_THREADS=4
 ENV TOKENIZERS_PARALLELISM=false
-ENV TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=TRUE
 ENV PYTORCH_ENABLE_SDP_KERNELS=TRUE
 ENV TRITON_CACHE_DIR=/tmp/triton-cache
 ENV TORCHINDUCTOR_COMPILE_THREADS=4
 ENV PYTORCH_HIP_ALLOC_REUSE_GPU_MEMORY=1
-ENV FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE
-ENV FLASH_ATTENTION_TRITON_AMD_AUTOTUNE=TRUE
-
-COPY config.env /tmp/config.env
  
-RUN set -a \
-    && . /tmp/config.env \
-    && set +a
+COPY config.env /tmp/config.env
  
 # ---------------------------------------------------------
 # 基本ツール
@@ -30,7 +24,7 @@ RUN apt-get update && apt-get install -y \
     cmake pkg-config protobuf-compiler libprotobuf-dev dos2unix bash curl \
     git wget ffmpeg libsndfile1 build-essential ca-certificates patch iproute2 && \
     rm -rf /var/lib/apt/lists/*
-
+ 
 # ---------------------------------------------------------
 # Python venv
 # ---------------------------------------------------------
