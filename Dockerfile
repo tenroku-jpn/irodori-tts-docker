@@ -40,13 +40,13 @@ RUN mkdir build && cd build && \
     cmake .. && make -j"$(nproc)" && make install && ldconfig
 
 WORKDIR /tmp/sentencepiece/python
-RUN python3 setup.py bdist_wheel
+RUN python3 setup.py bdist_wheel || { echo "bdist_wheel failed"; ls -R /tmp/sentencepiece/python; exit 1; }
 
 WORKDIR /tmp/sentencepiece/python/dist
-
-RUN ls -R /tmp/sentencepiece/python/dist
+RUN ls -R . || { echo "dist folder missing"; exit 1; }
 
 RUN pip3 install sentencepiece-0.1.99-*.whl
+
 
  
 # ---------------------------------------------------------
