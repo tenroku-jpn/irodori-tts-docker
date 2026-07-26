@@ -182,7 +182,9 @@ echo
 echo '============================================'
 echo '5-5. make docker-compose.yml                '
 echo '============================================'
- 
+
+cd ~/docker/irodori-tts-docker
+
 if dpkg --compare-versions "$ROCM_VERSION_SHORT" ge "7.9"; then
     echo "Preview series (7.9+) 用 docker-compose.yml を生成"
 
@@ -339,7 +341,7 @@ echo
 echo '============================================'
 echo '5-7. Docker build'
 echo '============================================'
-cd ~/docker/irodori-tts-docker
+
 $COMPOSE build --no-cache
  
 echo
