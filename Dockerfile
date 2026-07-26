@@ -30,7 +30,19 @@ RUN apt-get update && apt-get install -y \
 # ---------------------------------------------------------
 # Note: No prebuilt ROCm-compatible wheel is available for sentencepiece on Python 3.12,
 # so it is built from source during the image build process.
-RUN pip3 install sentencepiece==0.1.99
+RUN pip3 install --upgrade pip setuptools wheel uv
+WORKDIR /tmp/sentencepiece
+ 
+RUN git clone https://github.com/google/sentencepiece.git .
+ 
+RUN git checkout v0.1.99
+ 
+RUN mkdir build && cd build && \
+    cmake .. && make -j"$(nproc)" && make install && ldconfig
+ 
+RUN cd python && python3 setup.py bdist_wheel
+ 
+RUN pip3 install python/dist/sentencepiece-0.1.99-*.whl
  
 # ---------------------------------------------------------
 # ROCm WHL
