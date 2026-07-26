@@ -166,7 +166,9 @@ echo
 echo '============================================'
 echo '5-4. GPU detection                          '
 echo '============================================'
- 
+
+cd ~/docker/irodori-tts-docker
+
 export HSA_ENABLE_DXG_DETECTION=1
  
 grep -q "HSA_ENABLE_DXG_DETECTION=1" ~/.bashrc || \
