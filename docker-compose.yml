@@ -27,7 +27,7 @@ services:
       - ./benchmark.py:/opt/Irodori-TTS/benchmark.py
 
       # ROCm ライブラリ
-      - /opt/rocm/:/opt/rocm/
+
       - /opt/rocm/core-7.14/lib/llvm/amdgcn/:/opt/rocm/amdgcn/
       - /opt/rocm/core-7.14/bin/:/opt/rocm/bin/
       - /opt/rocm/core-7.14/:/opt/rocm/core/
