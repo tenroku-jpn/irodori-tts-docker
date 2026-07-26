@@ -43,6 +43,9 @@ WORKDIR /tmp/sentencepiece/python
 RUN python3 setup.py bdist_wheel
 
 WORKDIR /tmp/sentencepiece/python/dist
+
+RUN ls -R /tmp/sentencepiece/python/dist
+
 RUN pip3 install sentencepiece-0.1.99-*.whl
 
  
