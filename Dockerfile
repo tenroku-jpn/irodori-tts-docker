@@ -5,7 +5,7 @@ ENV HSA_ENABLE_SDMA=0
 ENV HSA_ENABLE_DXG_DETECTION=1
 ENV MIOPEN_FIND_MODE=FAST
 ENV MIOPEN_USER_DB_PATH=/tmp/miopen-cache
-ENV LD_LIBRARY_PATH=/opt/rocm/lib:/opt/rocm/lib64:/opt/rocm/hip/lib:/usr/lib/wsl/lib:/usr/lib/rocm
+ENV LD_LIBRARY_PATH=/opt/rocm/lib:/usr/lib/wsl/lib:${LD_LIBRARY_PATH}
 ENV PYTORCH_HIP_ALLOC_CONF="garbage_collection_threshold:0.8,max_split_size_mb:512"
 ENV TORCH_BLAS_PREFER_HIPBLASLT=1
 ENV OMP_NUM_THREADS=4
@@ -17,7 +17,7 @@ ENV PYTORCH_HIP_ALLOC_REUSE_GPU_MEMORY=1
 ENV HSA_PATH=/opt/rocm
 ENV ROCM_PATH=/opt/rocm
 
-ENV PATH=/opt/rocm/bin:/opt/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=/opt/rocm/bin:${PATH}
  
 COPY config.env /tmp/config.env
  
