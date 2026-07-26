@@ -20,36 +20,29 @@ COPY config.env /tmp/config.env
 # 基本ツール
 # ---------------------------------------------------------
 RUN apt-get update && apt-get install -y \
-    python3 python3-pip python3-venv python3-setuptools python3-dev \
+    python3 python3-pip python3-setuptools python3-dev \
     cmake pkg-config protobuf-compiler libprotobuf-dev dos2unix bash curl \
     git wget ffmpeg libsndfile1 build-essential ca-certificates patch iproute2 && \
     rm -rf /var/lib/apt/lists/*
- 
-# ---------------------------------------------------------
-# Python venv
-# ---------------------------------------------------------
-RUN python3 -m venv /opt/venv
-ENV PATH=/opt/venv/bin:$PATH
- 
-RUN pip3 install --upgrade pip setuptools wheel uv
+
+RUN pip3 install --upgrade pip setuptools wheel uv 
  
 # ---------------------------------------------------------
 # SentencePiece 0.1.99
 # ---------------------------------------------------------
 # Note: No prebuilt ROCm-compatible wheel is available for sentencepiece on Python 3.12,
 # so it is built from source during the image build process.
- 
 WORKDIR /tmp/sentencepiece
- 
+
 RUN git clone https://github.com/google/sentencepiece.git .
- 
+
 RUN git checkout v0.1.99
- 
+
 RUN mkdir build && cd build && \
     cmake .. && make -j"$(nproc)" && make install && ldconfig
- 
+
 RUN cd python && python3 setup.py bdist_wheel
- 
+
 RUN pip3 install python/dist/sentencepiece-0.1.99-*.whl
  
 # ---------------------------------------------------------
