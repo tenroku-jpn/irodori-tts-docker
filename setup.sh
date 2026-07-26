@@ -104,7 +104,7 @@ else
  
                 sudo tee /etc/apt/sources.list.d/rocm.list << EOF
                 deb [arch=amd64 signed-by=/etc/apt/keyrings/amdrocm.gpg] https://repo.amd.com/rocm/packages-multi-arch/ubuntu2404 stable main
-                EOF
+EOF
  
                 sudo apt update
                
