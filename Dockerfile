@@ -30,19 +30,26 @@ RUN apt-get update && apt-get install -y \
 # ---------------------------------------------------------
 # Note: No prebuilt ROCm-compatible wheel is available for sentencepiece on Python 3.12,
 # so it is built from source during the image build process.
+
+# venv 作成（sentencepiece 専用）
+RUN python3 -m venv /opt/venv
+ENV PATH=/opt/venv/bin:$PATH
+
+# pip を venv 内でアップグレード（ここは壊れない）
 RUN pip3 install --upgrade pip setuptools wheel uv
+
+# sentencepiece を venv 内でビルド
 WORKDIR /tmp/sentencepiece
- 
 RUN git clone https://github.com/google/sentencepiece.git .
- 
 RUN git checkout v0.1.99
- 
-RUN mkdir build && cd build && \
-    cmake .. && make -j"$(nproc)" && make install && ldconfig
- 
-RUN cd python && python3 setup.py bdist_wheel
- 
-RUN pip3 install python/dist/sentencepiece-0.1.99-*.whl
+RUN mkdir build && cd build && cmake .. && make -j"$(nproc)" && make install && ldconfig
+WORKDIR /tmp/sentencepiece/python
+RUN python setup.py bdist_wheel
+WORKDIR /tmp/sentencepiece/python/dist
+RUN pip install sentencepiece-0.1.99-*.whl
+
+# venv の site-packages を system にリンク（Irodori-TTS が使えるように）
+RUN cp -r /opt/sp-venv/lib/python3.12/site-packages/* /usr/local/lib/python3.12/dist-packages/
  
 # ---------------------------------------------------------
 # ROCm WHL
