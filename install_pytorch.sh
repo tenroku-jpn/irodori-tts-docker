@@ -23,7 +23,7 @@ if dpkg --compare-versions "$ROCM_VERSION_SHORT" ge "7.9"; then
             -f "$WHEEL_URL"
 else
     echo "Install Production series (7.0 - 7.8)"
-        pip3 install --index-url https://repo.amd.com/rocm/whl-multi-arch/ \
+        pip3 install --index-url "$WHEEL_URL" \
             "torch[device-$LLVM_TARGET]==$TORCH_VERSION+rocm$ROCM_VERSION" \
             "torchvision[device-$LLVM_TARGET]==$VISION_VERSION+rocm$ROCM_VERSION" \
             "torchaudio==$AUDIO_VERSION+rocm$ROCM_VERSION"
