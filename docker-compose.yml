@@ -37,7 +37,7 @@ services:
       - /opt/rocm/core-7.14/libexec/:/opt/rocm/libexec/
       - /opt/rocm/core-7.14/lib/llvm/:/opt/rocm/llvm/
       - /opt/rocm/core-7.14/share/:/opt/rocm/share/
-      - /usr/lib/wsl/lib/:/opt/rocm/lib/
+      - /usr/lib/wsl/lib/:/usr/lib/wsl/lib/
 
       # キャッシュ
       - ./miopen-cache:/tmp/miopen-cache
