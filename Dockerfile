@@ -39,9 +39,12 @@ RUN git checkout v0.1.99
 RUN mkdir build && cd build && \
     cmake .. && make -j"$(nproc)" && make install && ldconfig
 
-RUN cd python && python3 setup.py bdist_wheel
+WORKDIR /tmp/sentencepiece/python
+RUN python3 setup.py bdist_wheel
 
-RUN pip3 install python/dist/sentencepiece-0.1.99-*.whl
+WORKDIR /tmp/sentencepiece/python/dist
+RUN pip3 install sentencepiece-0.1.99-*.whl
+
  
 # ---------------------------------------------------------
 # ROCm WHL
