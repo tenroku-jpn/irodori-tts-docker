@@ -13,6 +13,7 @@ ENV PYTORCH_ENABLE_SDP_KERNELS=TRUE
 ENV TRITON_CACHE_DIR=/tmp/triton-cache
 ENV TORCHINDUCTOR_COMPILE_THREADS=4
 ENV PYTORCH_HIP_ALLOC_REUSE_GPU_MEMORY=1
+ENV PATH=/opt/rocm/bin:/opt/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
  
 COPY config.env /tmp/config.env
  
@@ -24,7 +25,7 @@ RUN apt-get update && apt-get install -y \
     cmake pkg-config protobuf-compiler libprotobuf-dev dos2unix bash curl \
     git wget ffmpeg libsndfile1 build-essential ca-certificates patch iproute2 && \
     rm -rf /var/lib/apt/lists/*
- 
+
 # ---------------------------------------------------------
 # Python venv
 # ---------------------------------------------------------
