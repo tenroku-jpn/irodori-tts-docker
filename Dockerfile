@@ -20,7 +20,7 @@ COPY config.env /tmp/config.env
 # 基本ツール
 # ---------------------------------------------------------
 RUN apt-get update && apt-get install -y \
-    python3 python3-pip python3-setuptools python3-dev \
+    python3 python3-pip python3-setuptools python3-dev python3-sentencepiece \
     cmake pkg-config protobuf-compiler libprotobuf-dev dos2unix bash curl \
     git wget ffmpeg libsndfile1 build-essential ca-certificates patch iproute2 && \
     rm -rf /var/lib/apt/lists/*
