@@ -11,7 +11,6 @@ source /tmp/config.env
  
 cd /tmp/wheels
  
-pip3 install --upgrade pip setuptools wheel
 pip3 install numpy==1.26.4
  
 if dpkg --compare-versions "$ROCM_VERSION_SHORT" ge "7.9"; then
