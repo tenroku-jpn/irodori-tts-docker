@@ -80,9 +80,9 @@ REM =========================================================
  
 wsl -d %DISTRO% -- bash -c "mkdir -p ~/docker"
 
-wsl -d %DISTRO% -- bash -c ^
-"test -d ~/docker/irodori-tts-docker || git clone https://github.com/tenroku-jpn/irodori-tts-docker.git ~/docker/irodori-tts-docker; \
-cd ~/docker/irodori-tts-docker && git pull"
+wsl -d %DISTRO% -- bash -c "test -d ~/docker/irodori-tts-docker || git clone https://github.com/tenroku-jpn/irodori-tts-docker.git ~/docker/irodori-tts-docker"
+
+wsl -d %DISTRO% -- bash -c "cd ~/docker/irodori-tts-docker && git pull"
 
 wsl -d %DISTRO% -- bash ~/docker/irodori-tts-docker/setup.sh
  
