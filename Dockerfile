@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y \
     git wget ffmpeg libsndfile1 build-essential ca-certificates patch iproute2 && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --upgrade pip setuptools wheel uv 
+RUN pip3 install --upgrade pip setuptools wheel 
  
 # ---------------------------------------------------------
 # SentencePiece 0.1.99
