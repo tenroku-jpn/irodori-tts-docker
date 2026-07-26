@@ -184,7 +184,7 @@ echo '============================================'
 if dpkg --compare-versions "$ROCM_VERSION_SHORT" ge "7.9"; then
     echo "Preview series (7.9+) 用 docker-compose.yml を生成"
 
-    cat > docker-compose.yml << 'EOF'
+    cat > docker-compose.yml << EOF
 services:
   irodori:
     build:
@@ -257,7 +257,7 @@ EOF
 else
     echo "Production series (7.0 - 7.8) 用 docker-compose.yml を生成"
 
-    cat > docker-compose.yml << 'EOF'
+    cat > docker-compose.yml << EOF
 services:
   irodori:
     build:
@@ -319,7 +319,6 @@ services:
     healthcheck:
       disable: true
 EOF
-
 fi
  
 echo
