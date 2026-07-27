@@ -214,10 +214,10 @@ uv run python benchmark.py
 ```
 | GPU | Precision | decode | avg(sec) | RTF | Backend | PyTorch | OS |
 |------|------|------|------:|------:|------|------|------|
-| AMD Radeon RX 7900 XT | fp32 | sequential | 3.37 | 0.323 | ROCm | 2.10.0+rocm7.2.1.gitb07cec22 | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
-| AMD Radeon RX 7900 XT | fp32 | batch | 3.37 | 0.323 | ROCm | 2.10.0+rocm7.2.1.gitb07cec22 | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
-| AMD Radeon RX 7900 XT | bf16 | sequential | 0.97 | 0.093 | ROCm | 2.10.0+rocm7.2.1.gitb07cec22 | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
-| AMD Radeon RX 7900 XT | bf16 | batch | 0.96 | 0.091 | ROCm | 2.10.0+rocm7.2.1.gitb07cec22 | Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
+| AMD Radeon RX 7900 XT | fp32 | sequential | 3.09 | 0.296 | ROCm | 2.10.0+rocm7.2.1.gitb07cec22 | Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
+| AMD Radeon RX 7900 XT | fp32 | batch | 3.12 | 0.299 | ROCm | 2.10.0+rocm7.2.1.gitb07cec22 | Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
+| AMD Radeon RX 7900 XT | bf16 | sequential | 0.91 | 0.087 | ROCm | 2.10.0+rocm7.2.1.gitb07cec22 | Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
+| AMD Radeon RX 7900 XT | bf16 | batch | 0.92 | 0.087 | ROCm | 2.10.0+rocm7.2.1.gitb07cec22 | Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
 | AMD Radeon RX 7900 XT | fp32 | sequential | 3.06 | 0.293 | ROCm | 2.12.0+rocm7.14.0 | Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
 | AMD Radeon RX 7900 XT | fp32 | batch | 3.06 | 0.293 | ROCm | 2.12.0+rocm7.14.0 | Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
 | AMD Radeon RX 7900 XT | bf16 | sequential | 0.81 | 0.078 | ROCm | 2.12.0+rocm7.14.0 | Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39 |
