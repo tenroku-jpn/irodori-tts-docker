@@ -10,6 +10,8 @@
 [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-green.svg)](LICENSE)
 
 AMD Radeon GPU（WSL2 + ROCm + ROCDXG）向けの GPU 加速 Irodori TTS オールインワン環境です。
+先行版ROCmにも対応しています。
+preview版を選択ください。
 
 以下の 3 サーバーを 1 コンテナで同時起動します。
 
@@ -193,7 +195,7 @@ rocminfo
 
 ## RDNA4
 
-* （動作確認予定）
+* 
 
 ---
 
