@@ -278,7 +278,6 @@ services:
 
     group_add:
       - video
-      - render
 
     volumes:
       # override パッチ
