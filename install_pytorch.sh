@@ -23,10 +23,10 @@ if dpkg --compare-versions "$ROCM_VERSION_SHORT" ge "7.9"; then
 else
     echo "Install Production series (7.0 - 7.8)"
     pip3 install \
-            torch==$TORCH_VERSION \
-            torchvision==$VISION_VERSION \
-            torchaudio==$AUDIO_VERSION \
-            -f "$WHEEL_URL"
+        torch==$TORCH_VERSION \
+        torchvision==$VISION_VERSION \
+        torchaudio==$AUDIO_VERSION \
+        -f "$WHEEL_URL"
 fi
  
 pip3 install pillow jinja2 markupsafe typing-extensions filelock fsspec
