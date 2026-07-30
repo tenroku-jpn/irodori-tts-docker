@@ -47,6 +47,7 @@ Adrenalin 26.5.2以降はプレビュー版であるROCm 7.13.0が使用でき�
 - [AMD Software: Adrenalin Edition 26.6.1](https://www.amd.com/ja/resources/support-articles/release-notes/RN-RAD-WIN-26-6-1.html)
 - [AMD Software: Adrenalin Edition 26.6.2](https://www.amd.com/ja/resources/support-articles/release-notes/RN-RAD-WIN-26-6-2.html)
 - [AMD Software: Adrenalin Edition 26.6.4](https://www.amd.com/en/resources/support-articles/release-notes/RN-RAD-WIN-26-6-4.html)
+- [AMD Software: Adrenalin Edition 26.7.1](https://www.amd.com/en/resources/support-articles/release-notes/RN-RAD-WIN-26-7-1.html)
 
 ---
 
