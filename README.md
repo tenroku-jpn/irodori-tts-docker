@@ -6,7 +6,7 @@
 [![Adrenalin](https://img.shields.io/badge/Adrenalin-26.2.2-red.svg?logo=amd)](https://rocm.docs.amd.com/projects/radeon-ryzen/en/docs-7.2.1/docs/install/installrad/wsl/howto_wsl.html)
 [![ROCm](https://img.shields.io/badge/ROCm-7.2.1-orange.svg?logo=amd)](https://rocm.docs.amd.com/projects/radeon-ryzen/en/docs-7.2.1/docs/install/installrad/wsl/howto_wsl.html)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker)](https://www.docker.com/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-ROCm_2.10-EE4C2C.svg?logo=pytorch)](https://pytorch.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.10-EE4C2C.svg?logo=pytorch)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/Code%20License-MIT-green.svg)](LICENSE)
 
 AMD Radeon GPU（WSL2 + ROCm + ROCDXG）向けの GPU 加速 Irodori TTS オールインワン環境です。
