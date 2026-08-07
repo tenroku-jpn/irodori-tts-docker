@@ -1,100 +1,74 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
- 
-URL=https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html
+
+URL="https://rocm.docs.amd.com/en/latest/compatibility/compatibility-matrix.html"
 OUTDIR="config/GPU"
- 
+
+echo "[INFO] Fetching ROCm compatibility matrix..."
+HTML=$(curl -s "$URL")
+
+rm -rf "$OUTDIR"
 mkdir -p "$OUTDIR"
- 
-# パック定義
-declare -A PACKS=(
-    ["gfx110X-all"]="gfx1100,gfx1101"
-    ["gfx103X-all"]="gfx1030,gfx1031"
-    ["gfx1150"]="gfx1150"
-    ["gfx1151"]="gfx1151"
-    ["gfx1152"]="gfx1152"
-    ["gfx90a"]="gfx90a"
-    ["gfx908"]="gfx908"
-    ["gfx120X-all"]="gfx1200,gfx1201"
-    ["gfx90X-dcgpu"]="gfx90a,gfx908"
-    ["gfx94X-dcgpu"]="gfx942,gfx940"
-    ["gfx950-dcgpu"]="gfx950"
-)
- 
-# キー名を大文字＋アンダーバー化
-normalize_key() {
-    echo "$1" \
+
+count=0
+
+while read -r OPT; do
+    NAME=$(echo "$OPT" | grep -oP '>\K[^<]+')
+    GFX=$(echo "$OPT" | grep -oP 'data-selector-extra-bindings='\''\{"gfx": "\K[^"]+')
+
+    [ -z "$NAME" ] && continue
+    [ -z "$GFX" ] && continue
+
+    # AMD を削除してファイル名生成
+    BASE=$(echo "$NAME" | sed 's/^AMD //')
+    FILENAME=$(echo "$BASE" \
         | tr '[:lower:]' '[:upper:]' \
-        | sed 's/ /_/g' \
-        | sed 's/[^A-Z0-9_]/_/g'
-}
- 
-# gfx → PACK_NAME 判定
-detect_pack() {
-    local gfx="$1"
-    for pack in "${!PACKS[@]}"; do
-        IFS=',' read -ra arr <<< "${PACKS[$pack]}"
-        for g in "${arr[@]}"; do
-            [[ "$g" == "$gfx" ]] && echo "$pack" && return
-        done
-    done
-    echo "$gfx"
-}
+        | sed 's/[^A-Z0-9]/_/g' \
+        | sed 's/_\+/_/g' \
+        | sed 's/^_//;s/_$//')
 
- 
-echo "[INFO] Fetching AMD GPU table..."
-html=$(curl -s "$URL" || echo "")
- 
-[[ -z "$html" ]] && {
-    echo "[ERROR] Failed to fetch AMD page."
-    exit 1
-}
- 
-line=$(echo "$html" | tr '\n' ' ')
-tables=$(echo "$line" | grep -oP '<table.*?</table>')
- 
-IFS=$'\n'
-for table in $tables; do
-    # ヘッダを抽出
-    headers=($(echo "$table" \
-        | grep -oP '<th[^>]*>.*?</th>' \
-        | sed 's/<[^>]*>//g'))
+    # GFX をファイル名から削除
+    FILENAME=$(echo "$FILENAME" | sed -E 's/_GFX[0-9A-Z]+$//')
 
-    # 「GPU」というヘッダを持たないテーブルはスキップ
-    echo "${headers[@]}" | grep -q "GPU" || continue
-    
-    rows=$(echo "$table" | grep -oP '<tr[^>]*>.*?</tr>')
- 
-    for row in $rows; do
-        cols=($(echo "$row" \
-            | grep -oP '<td[^>]*>.*?</td>' \
-            | sed 's/<[^>]*>//g'))
- 
-        [[ ${#cols[@]} -eq 0 ]] && continue
-        [[ ${#cols[@]} -ne ${#headers[@]} ]] && continue
- 
-        support="${cols[-1]}"
-        echo "$support" | grep -q "✅" || continue
- 
-        gpu="${cols[0]}"
-        llvm="${cols[2]}"
-        pack=$(detect_pack "$llvm")
- 
-        fname=$(echo "$gpu" | tr ' /' '_' | tr '[:lower:]' '[:upper:]')
- 
-        echo "[INFO] Generating $fname.env"
- 
-        {
-            for i in "${!headers[@]}"; do
-                key=$(normalize_key "${headers[$i]}")
-                val="${cols[$i]}"
-                echo "${key}=\"${val}\""
-            done
- 
-            # PACK_NAME を追加
-            echo "PACK_NAME=\"${pack}\""
-        } > "$OUTDIR/$fname.env"
-    done
-done
- 
-echo "[INFO] GPU env generation complete."
+    #### SERIES 抽出 ####
+
+    SERIES=""
+
+    # Instinct MIxxx
+    if echo "$NAME" | grep -q "Instinct MI"; then
+        NUM=$(echo "$NAME" | grep -oP 'MI\K[0-9]+')
+        SERIES="MI$(echo "$NUM" | sed 's/[0-9]$/00/')"
+    fi
+
+    # Radeon RX xxxx
+    if echo "$NAME" | grep -q "Radeon RX"; then
+        NUM=$(echo "$NAME" | grep -oP 'RX \K[0-9]+')
+        SERIES="RX$(echo "$NUM" | sed 's/[0-9]$/000/')"
+    fi
+
+    # Radeon AI PRO Rxxxx
+    if echo "$NAME" | grep -q "Radeon AI PRO R"; then
+        NUM=$(echo "$NAME" | grep -oP 'R\K[0-9]+')
+        SERIES="R$(echo "$NUM" | sed 's/[0-9]$/000/')"
+    fi
+
+    # Ryzen AI
+    if echo "$NAME" | grep -q "Ryzen AI"; then
+        NUM=$(echo "$NAME" | grep -oP '\b[0-9]{3}\b')
+        SERIES="AI$(echo "$NUM" | sed 's/[0-9]$/00/')"
+    fi
+
+    FILEPATH="$OUTDIR/${FILENAME}.env"
+
+    echo "[INFO] Generating ${FILENAME}.env"
+
+    cat <<EOF > "$FILEPATH"
+AMD_GPU="$NAME"
+SERIES="$SERIES"
+LLVM_TARGET="$GFX"
+EOF
+
+    count=$((count + 1))
+done < <(echo "$HTML" | grep -oP '<option[^>]+>[^<]+')
+
+echo "[INFO] Generated $count GPU definitions."
