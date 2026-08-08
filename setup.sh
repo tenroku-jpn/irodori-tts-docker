@@ -369,7 +369,7 @@ echo '============================================'
 echo '5-10. Create Windows shortcut via PowerShell'
 echo '============================================'
 
-# Windows のユーザー名を WSL から取得（最重要）
+# Windows のユーザー名を WSL から取得
 WINUSER=$(powershell.exe -NoProfile -Command '$env:USERNAME' | tr -d '\r')
 
 ICON_SRC="$HOME/docker/irodori-tts-docker/irodori-tts.ico"
@@ -378,35 +378,31 @@ ICON_DST="/mnt/c/Users/$WINUSER/AppData/Local/Irodori-TTS/irodori-tts.ico"
 mkdir -p "$(dirname "$ICON_DST")"
 cp "$ICON_SRC" "$ICON_DST"
 
+# PowerShell に渡すための Windows パスを WSL 側で完成させる
+ICON_WIN="C:\\Users\\$WINUSER\\AppData\\Local\\Irodori-TTS\\irodori-tts.ico,0"
+
 PS1_TMP=$(mktemp /tmp/irodori-tts-shortcut-XXXXXX.ps1)
 
 cat > "$PS1_TMP" << EOF
 \$WshShell = New-Object -ComObject WScript.Shell
 
-# Shortcut path
 \$desktop = [Environment]::GetFolderPath('Desktop')
 \$lnk = Join-Path \$desktop 'Irodori-TTS.lnk'
 
-# Target: Windows Terminal
 \$shortcut = \$WshShell.CreateShortcut(\$lnk)
 \$shortcut.TargetPath = 'wt.exe'
 
-# Arguments: WSL → launch.sh
 \$shortcut.Arguments = 'wsl.exe -d "$WSL_DISTRO_NAME" -- bash -l -c "exec ~/.local/share/irodori-tts/launch.sh"'
 
-# アイコン指定
-\$shortcut.IconLocation = "C:\\Users\\$WINUSER\\AppData\\Local\\Irodori-TTS\\irodori-tts.ico,0"
+# アイコン指定（WSL 側で完成させた文字列をそのまま使う）
+\$shortcut.IconLocation = "$ICON_WIN"
 
 \$shortcut.Description = 'Launch Irodori-TTS (WSL)'
 \$shortcut.Save()
 EOF
 
-# Convert WSL path → Windows path
 PS1_WIN=$(wslpath -w "$PS1_TMP")
-
-# Execute PowerShell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$PS1_WIN" >/dev/null 2>&1
-
 rm -f "$PS1_TMP"
 
 echo "Windows shortcut created on Desktop."
