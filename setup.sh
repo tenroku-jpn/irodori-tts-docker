@@ -378,7 +378,7 @@ ICON_DST="/mnt/c/Users/$WINUSER/AppData/Local/Irodori-TTS/irodori-tts.ico"
 mkdir -p "$(dirname "$ICON_DST")"
 cp "$ICON_SRC" "$ICON_DST"
 
-PS1_TMP=$(mktemp /tmp/irodori-tts-shortcut.ps1)
+PS1_TMP=$(mktemp /tmp/irodori-tts-shortcut-XXXXXX.ps1)
 
 cat > "$PS1_TMP" << EOF
 \$WshShell = New-Object -ComObject WScript.Shell
