@@ -11,22 +11,23 @@ source /tmp/config.env
  
 cd /tmp/wheels
  
+pip3 install --upgrade pip setuptools wheel
 pip3 install numpy==1.26.4
  
 if dpkg --compare-versions "$ROCM_VERSION_SHORT" ge "7.9"; then
     echo "Preview series (7.9+)"
-    pip3 install --index-url "$WHEEL_URL" \
-        "torch[device-$LLVM_TARGET]==$TORCH_VERSION+rocm$ROCM_VERSION" \
-        "torchvision[device-$LLVM_TARGET]==$VISION_VERSION+rocm$ROCM_VERSION" \
-        "torchaudio==$AUDIO_VERSION+rocm$ROCM_VERSION"
-    python3 -c "import torch; print(torch.cuda.is_available())"
+    pip3 install \
+            torch==$TORCH_VERSION \
+            torchvision==$VISION_VERSION \
+            torchaudio==$AUDIO_VERSION \
+            -f "$WHEEL_URL"
 else
     echo "Install Production series (7.0 - 7.8)"
-    pip3 install \
-        torch==$TORCH_VERSION \
-        torchvision==$VISION_VERSION \
-        torchaudio==$AUDIO_VERSION \
-        -f "$WHEEL_URL"
+        pip3 install --index-url "$WHEEL_URL" \
+            "torch[device-$LLVM_TARGET]==$TORCH_VERSION+rocm$ROCM_VERSION" \
+            "torchvision[device-$LLVM_TARGET]==$VISION_VERSION+rocm$ROCM_VERSION" \
+            "torchaudio==$AUDIO_VERSION+rocm$ROCM_VERSION"
+        python3 -c "import torch; print(torch.cuda.is_available())"
 fi
  
 pip3 install pillow jinja2 markupsafe typing-extensions filelock fsspec
