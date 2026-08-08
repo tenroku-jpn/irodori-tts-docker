@@ -391,7 +391,7 @@ cat > "$PS1_TMP" << EOF
 
 # Shortcut path
 \$desktop = [Environment]::GetFolderPath('Desktop')
-\$lnk = Join-Path \$desktop 'Irodori-TTS.lnk'
+\$lnk = Join-Path \$desktop 'Irodori-TTS(WSL - Ubuntu-24.04).lnk'
 
 # Shortcut
 \$shortcut = \$WshShell.CreateShortcut(\$lnk)
