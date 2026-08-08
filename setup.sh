@@ -391,21 +391,24 @@ cat > "$PS1_TMP" << EOF
 
 # Shortcut path
 \$desktop = [Environment]::GetFolderPath('Desktop')
-\$lnk = Join-Path \$desktop 'Irodori-TTS(WSL - Ubuntu-24.04).lnk'
+\$lnk = Join-Path \$desktop 'Irodori-TTS (WSL - Ubuntu-24.04).lnk'
 
 # Shortcut
 \$shortcut = \$WshShell.CreateShortcut(\$lnk)
 \$shortcut.TargetPath = 'wt.exe'
-\$shortcut.Arguments = 'wsl.exe -d "$WSL_DISTRO_NAME" -- bash -l -c "exec ~/.local/share/irodori-tts/launch.sh"'
-\$shortcut.IconLocation = "\$iconPath,0"
+\$shortcut.Arguments = 'wsl.exe -d "Ubuntu-24.04" -- bash -l -c "exec ~/.local/share/irodori-tts/launch.sh"'
+
+# アイコン指定（インデックス不要）
+\$shortcut.IconLocation = \$iconPath
 \$shortcut.Save()
 
-# アイコン更新
+# アイコン更新（Unsloth と同じ：ショートカットではなくアイコンファイルに通知）
 Add-Type -Namespace IrodoriShell -Name IconRefresh -MemberDefinition '
     [System.Runtime.InteropServices.DllImport("shell32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
     public static extern void SHChangeNotify(int eventId, uint flags, string item1, System.IntPtr item2);
 '
-[IrodoriShell.IconRefresh]::SHChangeNotify(0x00002000, 0x0005, \$lnk, [System.IntPtr]::Zero)
+
+[IrodoriShell.IconRefresh]::SHChangeNotify(0x00002000, 0x0005, \$iconPath, [System.IntPtr]::Zero)
 [IrodoriShell.IconRefresh]::SHChangeNotify(0x08000000, 0, \$null, [System.IntPtr]::Zero)
 EOF
 
