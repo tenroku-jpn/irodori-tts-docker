@@ -346,7 +346,68 @@ echo '============================================'
 echo '5-8. Docker start'
 echo '============================================'
 $COMPOSE up -d
- 
+
+echo '============================================'
+echo '5-9. Create WSL launcher script (launch.sh)'
+echo '============================================'
+
+LAUNCH_DIR="$HOME/.local/share/irodori-tts"
+mkdir -p "$LAUNCH_DIR"
+
+cat > "$LAUNCH_DIR/launch.sh" << 'EOF'
+#!/usr/bin/env bash
+set -e
+cd ~/docker/irodori-tts-docker
+docker compose up -d
+EOF
+
+chmod +x "$LAUNCH_DIR/launch.sh"
+
+echo "Created: $LAUNCH_DIR/launch.sh"
+
+echo '============================================'
+echo '5-10. Create Windows shortcut via PowerShell'
+echo '============================================'
+
+ICON_SRC="$HOME/docker/irodori-tts-docker/irodori-tts.ico"
+ICON_DST="/mnt/c/Users/$USER/AppData/Local/Irodori-TTS/irodori-tts.ico"
+
+mkdir -p "$(dirname "$ICON_DST")"
+cp "$ICON_SRC" "$ICON_DST"
+
+PS1_TMP=$(mktemp /tmp/irodori-tts-shortcut.ps1)
+
+cat > "$PS1_TMP" << EOF
+\$WshShell = New-Object -ComObject WScript.Shell
+
+# Shortcut path
+\$desktop = [Environment]::GetFolderPath('Desktop')
+\$lnk = Join-Path \$desktop 'Irodori-TTS.lnk'
+
+# Target: Windows Terminal
+\$shortcut = \$WshShell.CreateShortcut(\$lnk)
+\$shortcut.TargetPath = 'wt.exe'
+
+# Arguments: WSL → launch.sh
+\$shortcut.Arguments = 'wsl.exe -d "$WSL_DISTRO_NAME" -- bash -l -c "exec ~/.local/share/irodori/launch.sh"'
+
+# アイコン指定
+\$shortcut.IconLocation = "C:\\Users\\$USER\\AppData\\Local\\Irodori-TTS\\irodori.ico,0"
+
+\$shortcut.Description = 'Launch Irodori-TTS (WSL)'
+\$shortcut.Save()
+EOF
+
+# Convert WSL path → Windows path
+PS1_WIN=$(wslpath -w "$PS1_TMP")
+
+# Execute PowerShell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$PS1_WIN" >/dev/null 2>&1
+
+rm -f "$PS1_TMP"
+
+echo "Windows shortcut created on Desktop."
+
 echo
 echo '============================================'
 echo 'Setup completed'
