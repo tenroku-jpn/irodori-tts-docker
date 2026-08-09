@@ -372,60 +372,145 @@ echo '============================================'
 # Windows のユーザー名を取得
 WINUSER=$(powershell.exe -NoProfile -Command '$env:USERNAME' | tr -d '\r')
 
-# アイコンを Windows 側へコピー
+# プロジェクト側のアイコン（あればコピー）
 ICON_SRC="$HOME/docker/irodori-tts-docker/irodori-tts.ico"
-ICON_DST="/mnt/c/Users/$WINUSER/AppData/Local/Irodori-TTS/irodori-tts.ico"
 
-mkdir -p "$(dirname "$ICON_DST")"
-cp "$ICON_SRC" "$ICON_DST"
+# Unsloth と同じ仕組みだがアプリ名は Irodori-TTS（安定パス）
+ICON_DST_DIR="/mnt/c/Users/$WINUSER/AppData/Local/Irodori-TTS"
+ICON_DST="$ICON_DST_DIR/irodori-tts.ico"
 
-# PowerShell スクリプト生成
-PS1_TMP=$(mktemp /tmp/irodori-tts-shortcut-XXXXXX.ps1)
+mkdir -p "$ICON_DST_DIR"
+if [ -f "$ICON_SRC" ]; then
+    cp -f "$ICON_SRC" "$ICON_DST"
+fi
 
-cat > "$PS1_TMP" << EOF
+# WSL の distro とランチャー
+DISTRO="${WSL_DISTRO_NAME:-}"
+LAUNCHER="$HOME/.local/share/irodori-tts/launch.sh"
+
+# Build wsl args like Unsloth does (double-quoted distro and launcher)
+_css_wsl_args=""
+if [ -n "$DISTRO" ]; then
+    _css_wsl_args="-d \"$DISTRO\" "
+fi
+_css_wsl_args="${_css_wsl_args}-- bash -l -c \"exec \\\"$LAUNCHER\\\"\""
+
+# Detect whether Windows Terminal (wt.exe) is available
+_css_use_wt=false
+if command -v wt.exe >/dev/null 2>&1; then
+    _css_use_wt=true
+fi
+
+if [ "$_css_use_wt" = true ]; then
+    _css_sc_target='wt.exe'
+    _css_sc_args="wsl.exe $_css_wsl_args"
+else
+    _css_sc_target='wsl.exe'
+    _css_sc_args="$_css_wsl_args"
+fi
+
+# Escape single quotes for PowerShell single-quoted string embedding
+_css_sc_args_ps=$(printf '%s' "$_css_sc_args" | sed "s/'/''/g")
+
+# Shortcut name per-distro (Irodori-TTS style)
+if [ -n "$DISTRO" ]; then
+    _css_lnk_name="Irodori-TTS (WSL - ${DISTRO}).lnk"
+else
+    _css_lnk_name="Irodori-TTS (WSL).lnk"
+fi
+_css_lnk_name_ps=$(printf '%s' "$_css_lnk_name" | sed "s/'/''/g")
+
+# Create temp PowerShell script
+_css_ps1_tmp=$(mktemp /tmp/irodori-tts-shortcut-XXXXXX.ps1 2>/dev/null) || true
+if [ -n "$_css_ps1_tmp" ]; then
+    cat > "$_css_ps1_tmp" << WSLPS1_EOF
 \$WshShell = New-Object -ComObject WScript.Shell
-
-# Windows の LOCALAPPDATA を使ってパスを生成
-\$iconDir = Join-Path \$env:LOCALAPPDATA 'Irodori-TTS'
-\$iconPath = Join-Path \$iconDir 'irodori-tts.ico'
-
-# wt.exe の絶対パスを取得
-\$targetExe = (Get-Command 'wt.exe' -ErrorAction SilentlyContinue).Source
+\$targetExe = (Get-Command '$_css_sc_target' -ErrorAction SilentlyContinue).Source
 if (-not \$targetExe) { exit 1 }
 
-# Shortcut path
-\$desktop = [Environment]::GetFolderPath('Desktop')
-\$lnk = Join-Path \$desktop 'Irodori-TTS (WSL - Ubuntu-24.04).lnk'
+# Icon path in LOCALAPPDATA for Irodori-TTS
+\$iconDir = Join-Path \$env:LOCALAPPDATA 'Irodori-TTS'
+\$iconPath = Join-Path \$iconDir 'irodori-tts.ico'
+\$preIconHash = \$null
+if (Test-Path -LiteralPath \$iconPath) {
+    try { \$preIconHash = (Get-FileHash -LiteralPath \$iconPath -Algorithm SHA256).Hash } catch {}
+}
+if (-not (Test-Path -LiteralPath \$iconPath)) {
+    try {
+        New-Item -ItemType Directory -Force -Path \$iconDir | Out-Null
+        # (Optional) network fetch omitted; WSL already copied icon if available
+    } catch {}
+}
+\$hasIcon = \$false
+if (Test-Path -LiteralPath \$iconPath) {
+    try { \$b = [System.IO.File]::ReadAllBytes(\$iconPath); if (\$b.Length -ge 4 -and \$b[0] -eq 0 -and \$b[1] -eq 0 -and \$b[2] -eq 1 -and \$b[3] -eq 0) { \$hasIcon = \$true } } catch {}
+}
 
-# Shortcut
-\$shortcut = \$WshShell.CreateShortcut(\$lnk)
-\$shortcut.TargetPath = \$targetExe
-\$shortcut.Arguments = 'wsl.exe -d "Ubuntu-24.04" -- bash -l -c "exec ~/.local/share/irodori-tts/launch.sh"'
-\$shortcut.Description = 'Launch Irodori-TTS (WSL)'
+\$locations = @(
+    [Environment]::GetFolderPath('Desktop'),
+    (Join-Path \$env:APPDATA 'Microsoft\Windows\Start Menu\Programs')
+)
+\$created = @()
+\$firstShortcut = \$false
 
-# アイコン指定
-\$shortcut.IconLocation = "\$iconPath,0"
-\$shortcut.Save()
+foreach (\$dir in \$locations) {
+    if (-not \$dir -or -not (Test-Path \$dir)) { continue }
+    \$linkPath = Join-Path \$dir '$_css_lnk_name_ps'
+    if (-not (Test-Path -LiteralPath \$linkPath)) { \$firstShortcut = \$true }
+    \$shortcut = \$WshShell.CreateShortcut(\$linkPath)
+    \$shortcut.TargetPath = \$targetExe
+    \$shortcut.Arguments = '$_css_sc_args_ps'
+    \$shortcut.Description = 'Launch Irodori-TTS (WSL)'
+    if (\$hasIcon) { \$shortcut.IconLocation = "\$iconPath,0" }
+    \$shortcut.Save()
+    \$created += \$linkPath
+}
 
-# アイコン更新
-Add-Type -Namespace IrodoriShell -Name IconRefresh -MemberDefinition '
-    [System.Runtime.InteropServices.DllImport("shell32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
-    public static extern void SHChangeNotify(int eventId, uint flags, string item1, System.IntPtr item2);
-'
+\$iconChanged = \$false
+if (\$hasIcon) {
+    if (-not \$preIconHash) {
+        \$iconChanged = \$true
+    } else {
+        try {
+            \$postIconHash = (Get-FileHash -LiteralPath \$iconPath -Algorithm SHA256).Hash
+            \$iconChanged = (\$postIconHash -ne \$preIconHash)
+        } catch { \$iconChanged = \$true }
+    }
+} elseif (\$preIconHash) {
+    \$iconChanged = \$true
+}
 
-[UnslothShell.IconRefresh]::SHChangeNotify(0x00002000, 0x0005, \$lnk, [System.IntPtr]::Zero)
-[UnslothShell.IconRefresh]::SHChangeNotify(0x08000000, 0, \$null, [System.IntPtr]::Zero)
-EOF
+# Per-item refresh (SHChangeNotify on each created .lnk), then global assoc change
+try {
+    Add-Type -Namespace IrodoriShell -Name IconRefresh -MemberDefinition '[System.Runtime.InteropServices.DllImport("shell32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)] public static extern void SHChangeNotify(int e, uint f, string a, System.IntPtr b);' -ErrorAction SilentlyContinue
+    foreach (\$p in \$created) { try { [IrodoriShell.IconRefresh]::SHChangeNotify(0x00002000, 0x0005, \$p, [System.IntPtr]::Zero) } catch {} }
+    [IrodoriShell.IconRefresh]::SHChangeNotify(0x08000000, 0, \$null, [System.IntPtr]::Zero)
+} catch {}
 
-# Convert WSL path → Windows path
-PS1_WIN=$(wslpath -w "$PS1_TMP")
+# Heavier on-disk icon-cache clear + StartMenuExperienceHost tile rebuild only on first install or real icon change
+if (\$created.Count -gt 0 -and (\$firstShortcut -or \$iconChanged)) {
+    try { & "\$env:SystemRoot\System32\ie4uinit.exe" -ClearIconCache } catch {}
+    try { & "\$env:SystemRoot\System32\ie4uinit.exe" -show } catch {}
+    try {
+        \$smeh = Join-Path \$env:LOCALAPPDATA 'Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\TempState'
+        if (Test-Path -LiteralPath \$smeh) {
+            Get-ChildItem -LiteralPath \$smeh -Filter 'TileCache_*' -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath (Join-Path \$smeh 'StartUnifiedTileModelCache.dat') -Force -ErrorAction SilentlyContinue
+            Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction SilentlyContinue
+        }
+    } catch {}
+}
+WSLPS1_EOF
 
-# Execute PowerShell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$PS1_WIN" >/dev/null 2>&1
+    # Convert WSL path → Windows path
+    PS1_WIN=$(wslpath -w "$_css_ps1_tmp" 2>/dev/null)
+    if [ -n "$PS1_WIN" ]; then
+        powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$PS1_WIN" >/dev/null 2>&1 || true
+    fi
+    rm -f "$_css_ps1_tmp"
+fi
 
-rm -f "$PS1_TMP"
-
-echo "Windows shortcut created on Desktop."
+echo "Windows shortcut created on Desktop (Irodori-TTS)."
 
 echo
 echo '============================================'
