@@ -205,11 +205,6 @@ services:
       - video
 
     volumes:
-      # override パッチ
-      - ./overrides/infer.py:/opt/Irodori-TTS/infer.py
-      - ./overrides/gradio_app.py:/opt/Irodori-TTS/gradio_app.py
-      - ./overrides/gradio_app_voicedesign.py:/opt/Irodori-TTS/gradio_app_voicedesign.py
-      - ./overrides/irodori_tts/rocm_compat.py:/opt/Irodori-TTS/irodori_tts/rocm_compat.py
 
       # benchmark
       - ./benchmark.py:/opt/Irodori-TTS/benchmark.py
@@ -277,11 +272,6 @@ services:
       - video
 
     volumes:
-      # override パッチ
-      - ./overrides/infer.py:/opt/Irodori-TTS/infer.py
-      - ./overrides/gradio_app.py:/opt/Irodori-TTS/gradio_app.py
-      - ./overrides/gradio_app_voicedesign.py:/opt/Irodori-TTS/gradio_app_voicedesign.py
-      - ./overrides/irodori_tts/rocm_compat.py:/opt/Irodori-TTS/irodori_tts/rocm_compat.py
 
       # benchmark
       - ./benchmark.py:/opt/Irodori-TTS/benchmark.py
